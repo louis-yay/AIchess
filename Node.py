@@ -36,10 +36,10 @@ class Node:
   def getNextMove(self):
     max = 0
     next = None
-    for move in self.childs:
-      if(move.getRatio() > max):
+    for move in self.childs.keys():
+      if(self.childs[move].getRatio() > max):
         next = move
-        max = move.getRatio()
+        max = self.childs[move].getRatio()
     return next
 
   def updateWin(self, status):

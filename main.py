@@ -1,4 +1,5 @@
 import os
+from Node import Node
 
 DATADIR = "data"
 
@@ -7,15 +8,14 @@ data = []
 
 print("#################################################")
 print("LECTURE DES FICHIERS")
-for file in os.listdir(DATADIR):
-    with open(DATADIR + "/" + file, "r", errors='ignore') as file:
-        print(file)
-
-        # Read only the gameplay part
-        
-        reader = file.read().split("\n\n")
-        for i in range(1, len(reader), 2):
-            data.append(reader[i])
+#for file in os.listdir(DATADIR):
+with open("sample.pgn", "r", errors='ignore') as file:
+    print(file)
+    # Read only the gameplay part
+    
+    reader = file.read().split("\n\n")
+    for i in range(1, len(reader), 2):
+        data.append(reader[i])
 
 
 # On remplace les retour à la ligne par des espaces
@@ -44,4 +44,38 @@ for i in range(len(data)):
         except IndexError:
             final[i].append(move[0])
 
-print(final[0])
+
+# Définition de l'arbre
+tree = Node()
+i = 0
+
+# Contruction de l'arbre
+for game in final:
+    current = tree
+    i += 1
+    for move in game:
+        print(f"Contruction de l'arbre: {i/len(data)*100}%")
+        if (game[-1] == "1-0"):
+            current.updateWin("white")
+        elif (game[-1] == "0-1"):
+            current.updateWin("black")
+        else:
+            current.updateWin("draw")
+        if (move in current.getChilds()):
+            current = current.getChilds()[move]
+        else:
+            current = current.addChild(move, Node())
+
+# Game
+# user play the whites
+current = tree
+while True:
+    print(current.getChilds())
+    # User play
+    move = input("Enter move using PGN format: ")
+    current = current.getChilds()[move]
+
+    # Computer play
+    play = current.getNextMove()
+    current = current.getChilds()[play]
+    print(f"played: {play}")
