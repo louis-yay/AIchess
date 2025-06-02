@@ -1,23 +1,29 @@
 # 1. Create a tab from a game
+data = []
+
 with open("sample.pgn", "r") as file:
 
     # Read only the gameplay part
-    data = file.read().split("\n\n")[1]
+    
+    reader = file.read().split("\n\n")
+    for i in range(1, len(reader), 2):
+        data.append(reader[i])
 
     # On remplace les retour à la ligne par des espaces
-    data = data.replace("\n", " ")
-
     # Split pour récupérer les coups un à un
-    data = data.split(" ")
+    for i in range(len(data)):
+        data[i] = data[i].replace("\n", " ")
+        data[i] = data[i].split(" ")
 
-final = []
+final = [ [] for i in range(len(data))]
 
 # Formatage d'un coup en retirant le numéro de manche
-for move in data:
-    move = move.split(".")
-    try:
-        final.append(move[1])
-    except IndexError:
-        final.append(move[0])
+for i in range(len(data)):
+    for move in data[i]:
+        move = move.split(".")
+        try:
+            final[i].append(move[1])
+        except IndexError:
+            final[i].append(move[0])
 
-print(final)
+print(final[0])
