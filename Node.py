@@ -34,7 +34,7 @@ class Node:
     return value
   
   def getNextMove(self):
-    max = 0
+    max = -1
     next = None
     for move in self.childs.keys():
       if(self.childs[move].getRatio() > max):
