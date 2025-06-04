@@ -217,6 +217,10 @@ class Board:
             case 'WK' | 'BK':       # King
                 return floor(origin.distance(dest)) == 1
         return False
+    
+    def play(self, origin, dest):
+        if(self.isLegalMove(origin, dest)):
+            self.movePiece(origin, dest)
 
 
 
