@@ -29,7 +29,9 @@ def constructTree(DIR):
 
     for i in range(len(data)):
         print(f'Extraction des coups: {round(i/len(data)*100)}%')
+        
         data[i] = data[i].replace("\n", " ")
+        data[i] = data[i].replace("+", "")      # Don't keep the chess note
         data[i] = data[i].split(" ")
         if "" in data[i]:
             data[i].remove("")
