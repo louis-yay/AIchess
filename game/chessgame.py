@@ -1,6 +1,8 @@
 from math import sqrt, floor
 from position import Position
 
+
+
 class Board:
 
     def __init__(self) -> None:
@@ -9,7 +11,7 @@ class Board:
         # W -> White & B -> Black
         # R -> Rook & N -> Knight & B -> Bishop & K -> King & Q -> Queen
         self.grid = [
-            # h     g    f      e     d     c     b     a   y/x
+            # a     b    c       d     e     f     g     h   y/x
             ['WR', 'WN', 'WB', 'WK', 'WQ', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
@@ -25,7 +27,7 @@ class Board:
     
     def resetGrid(self):
         self.grid = [
-            # h     g    f      e     d     c     b     a   y/x
+            # a     b    c       d     e     f     g     h   y/x
             ['WR', 'WN', 'WB', 'WK', 'WQ', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 3
@@ -38,27 +40,27 @@ class Board:
 
     def setTestGrid(self):
         self.grid = [
-            # h     g    f      e     d     c     b     a   y/x
-            ['WR', '00', 'WB', '00', 'WQ', '00', '00', 'WR'], # 1
-            ['00', '00', '00', '00', '00', 'WP', 'WP', '00'], # 2
-            ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 3
-            ['WP', '00', '00', 'WK', '00', '00', '00', 'BP'], # 4
-            ['00', 'BP', '00', '00', '00', 'WN', '00', '00'], # 5
-            ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
-            ['BP', '00', 'BP', 'BP', 'BP', 'BP', 'BP', '00'], # 7
-            ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
+            # a     b    c       d     e     f     g     h   y/x
+            ['WR', '00', '00', 'WQ', '00', 'WB', '00', '00'], # 1
+            ['00', '00', 'WP', '00', '00', 'WP', '00', '00'], # 2
+            ['00', 'WP', '00', '00', '00', '00', '00', '00'], # 3
+            ['BP', 'BP', '00', '00', 'WK', '00', '00', 'WP'], # 4
+            ['00', '00', 'WN', '00', '00', '00', 'BN', '00'], # 5
+            ['00', '00', '00', '00', 'WR', '00', '00', '00'], # 6
+            ['00', '00', '00', 'BR', '00', '00', '00', '00'], # 7
+            ['00', '00', '00', '00', '00', '00', '00', '00']  # 8
         ]
 
     def setConvertGrid(self):
         self.grid = [
-            # h     g    f      e     d     c     b     a   y/x
+            # a     b    c       d     e     f     g     h   y/x
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 1
-            ['00', '00', '00', '00', '00', '00', '00', '00'], # 2
+            ['00', 'WN', '00', '00', '00', 'WN', '00', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
-            ['00', '00', '00', 'WQ', '00', '00', '00', 'BP  '], # 4
+            ['00', '00', '00', 'WR', '00', '00', '00', '00'], # 4
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
-            ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
-            ['00', '00', '00', 'BP', '00', '00', 'BP', '00'], # 7
+            ['WQ', '00', '00', '00', '00', '00', '00', '00'], # 6
+            ['00', '00', '00', 'WR', '00', '00', 'WP', '00'], # 7
             ['00', '00', '00', '00', '00', '00', '00', '00']  # 8
         ]
 
@@ -97,7 +99,7 @@ class Board:
         if(len(square) == 2):
             if(square[0] >= 'a' and square[0] <= 'h' and square[1] >= '1' and square[1] <= '8'):
                 x = int(square[1]) -1
-                y = 7 - (ord(square[0]) - ord('a'))
+                y = (ord(square[0]) - ord('a'))
                 return Position(x,y)
         return None
 
@@ -174,6 +176,8 @@ class Board:
             
 
     def isLegalMove(self, origin, dest):
+        # TODO ADD promotion system
+
         """
         Take 2 chess position and check if the move is legal or not.
         """
@@ -206,7 +210,7 @@ class Board:
                         return False
                     
                     # Check forward movement and piece take
-                    if origin.y == dest.y  and origin.x < dest.x and self.checkOnMove(origin, dest): # forward
+                    if origin.y == dest.y  and origin.x < dest.x and self.checkOnMove(origin, dest) and destPiece == '00': # forward
                         return True
                     if destPiece[0] == "B" and origin.x < dest.x and self.checkOnMove(origin, dest, linear=False) and self.checkDiagonal(origin, dest, max=1):
                         return True
@@ -267,40 +271,64 @@ class Board:
             pass    # Big rock
 
         # Piece analysis
-        piece = ""
-        piece += ["W", "B"][switch]
-        dest = ""       # Destination of the given move
+        piece = ["W", "B"][switch]
+        output = [
+            "", # origin
+            "", # destination
+            None # Promotion
+            ]
         if(move[0] in ["R", "N", "B", "Q", "K"]):
             piece += move[0]
             move = move[1:]
         else:
             piece += "P"
-
-        # Format: [PieceCode][a-h][x/a-h] or [PieceCode][1-8][x/a-h]
-        if (((move[0] >= 'a' and move[0] <= 'h') or (move[0] >= '1' and move[0] <= '8')) and (move[1] == 'x' or (move[1] >= 'a' and move[1] <= 'h'))):
-            if(move[1] == 'x'):
-
-                # Check every enemy piece on the colomn to find a legal move to play.
-                for i in range(1,9):
-                    if self.getPiece(self.convertPosition(f"{move[0]}{i}")) == piece or self.getPiece(self.convertPosition(f"{chr(ord('a') + i)}{move[0]}")) == piece:
-                        for delta in range(1,9):
-
-                            # [PieceCode][a-h][x/a-h]
-                            if(self.isLegalMove(f"{move[0]}{i}", f"{move[0]}{delta}") and self.isEnemy(self.getPiece( self.convertPosition(f"{move[0]}{delta}")), switch)):
-                                return f"{move[0]}{i}", f"{move[0]}{delta}"
-                            
-                            # [PieceCode][1-8][x/a-h]
-                            elif(self.isLegalMove(f"{chr(ord('a') + i)}{move[0]}", f"{chr(ord('a') + delta)}{move[0]}") and self.isEnemy(self.getPiece( self.convertPosition(f"{chr(ord('a') + delta)}{move[0]}")), switch)):
-                                return f"{chr(ord('a') + i)}{move[0]}", f"{chr(ord('a') + delta)}{move[0]}"
-            else:
-                # Parcours the colomn to find the corresponding piece
-                for i in range(1, 9):
-
-                    # [PieceCode][a-h][x/a-h]
-                    if self.getPiece(self.convertPosition(f"{move[0]}{i}")) == piece:
-                        return f"{move[0]}{i}", f"{move[1]}{i}"
-                    
-                    # [PieceCode][1-8][x/a-h]
-                    elif self.getPiece(self.convertPosition(f"{chr(ord('a') + i)}{move[0]}")) == piece:
-                        return f"{chr(ord('a') + i)}{move[0]}", f"{move[1]}{move[0]}"
         
+        ### PRECISION SI 2 PIECE PEUVENT FINIR AU MEME ENDROIT.
+        #  la pièce vient de cette colonne
+        if((move[0] >= 'a' and move[0] <= 'h') and ((move[1] >= 'a' and move[1] <= 'h') or move[1] == 'x')):
+            for i in range(1,9):
+                if self.getPiece(self.convertPosition(f"{move[0]}{i}")) == piece:
+                    output[0] = f"{move[0]}{i}"
+                    move = move[1:]
+                    break
+        elif((move[0] >= '1' and move[0] <= '8')) and (move[1] == 'x' or (move[1] >= 'a' and move[1] <= 'h')):
+            for i in range(1,9):
+                if self.getPiece(self.convertPosition(f"{chr(ord('a') + i)}{move[0]}")) == piece:
+                    output[0] = f"{chr(ord('a') + i)}{move[0]}"
+                    move = move[1:]
+                    break
+        elif((move[0] >= 'a' and move[0] <= 'h') and (move[1] >= '1' and move[1] <= '8') and len(move) > 2 and ((move[2] >= 'a' and move[2] <= 'h') or move[1] == 'x')):
+                output[0] = f"{move[0]}{move[1]}"
+                move = move[2:]
+        else:
+            for i in range(8):
+                for j in range(8):
+                    if(self.grid[i][j] == piece):
+                        if self.isLegalMove(f"{chr(ord('a') + j)}{i + 1}", f"{move[0]}{move[1]}"):
+                            output[0] = f"{chr(ord('a') + j)}{i + 1}"
+
+        output[1] = f"{move[0]}{move[1]}"
+        move = move[2:]
+
+
+        move.replace('x', "")
+        if len(move) != 0:
+            if move[0] == '=':
+                output[2] == move[1]
+
+        return output
+
+
+        
+
+
+
+            
+
+                    
+
+
+
+board = Board()
+board.setConvertGrid()
+board.convertPgn("g8=B", False)
