@@ -64,6 +64,16 @@ class testNodeClass(unittest.TestCase):
         self.assertTrue(board.isLegalMove("c5", "a6")) # move
         self.assertFalse(board.isLegalMove("c5","e4")) # jump on ally piece
 
+    def test_ConvertPGN(self):
+        board = Board()
+        board.setConvertGrid()
+        self.assertEqual(board.convertPgn("Qec", False), ("e4", "c4"))  # Linear line move
+        self.assertEqual(board.convertPgn("Q4b", False), ("e4", "a4"))  # Linear line take
+        self.assertEqual(board.convertPgn("Q4b", False), ("e4", "b4"))  # Linear colomn move
+        self.assertEqual(board.convertPgn("Qex", False), ("e4", "c7"))  # Linear colomn take
+        
+        
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -49,11 +49,42 @@ class Board:
             ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
 
+    def setConvertGrid(self):
+        self.grid = [
+            # h     g    f      e     d     c     b     a   y/x
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 1
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 2
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
+            ['00', '00', '00', 'WQ', '00', '00', '00', 'BP  '], # 4
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
+            ['00', '00', '00', 'BP', '00', '00', 'BP', '00'], # 7
+            ['00', '00', '00', '00', '00', '00', '00', '00']  # 8
+        ]
+
     def Sign(self, value):
         if value < 0:
             return -1
         else:
             return 1
+        
+    def isBlack(self, piece):
+        if piece == None:
+            return False
+        else: return piece[0] == "B"
+
+    def isWhite(self, piece):
+        if piece == None:
+            return False
+        else: return piece[0] == "W"
+
+    def isEnemy(self, piece, switch=False):
+        """
+        Switch false = player play white
+        Switch true = player play black
+        Switch tell about player team
+        """
+        return [self.isBlack(piece), self.isWhite(piece)][switch]
 
     def convertPosition(self, square):
         """
@@ -75,6 +106,8 @@ class Board:
         Take chess position (cartesian) and return the name of the piece at the given position
         return None if the coordonate are not correct
         """
+        if square == None:
+            return None
         return self.grid[square.x][square.y]
         
     def movePiece(self, origin, dest):
@@ -215,12 +248,59 @@ class Board:
                     return self.checkOnMove(origin, dest, linear=False) and self.checkDiagonal(origin, dest)
                 
             case 'WK' | 'BK':       # King
-                return floor(origin.distance(dest)) == 1
+                  return floor(origin.distance(dest)) == 1
         return False
     
     def play(self, origin, dest):
         if(self.isLegalMove(origin, dest)):
             self.movePiece(origin, dest)
 
+    def convertPgn(self, move, switch=False):
+        """
+        Convert PGN formated move into classical chess move used in the rest of the program
+        the switch paramater define the player playing, fakse for white, true for black
+        We parcour all the piece that match the targeted type, and we check if the move is legal, the first piece with a legal move is moved.
+        """
+        if move == "O-O":
+            pass    # Small rock
+        if move == "O-O-O":
+            pass    # Big rock
 
+        # Piece analysis
+        piece = ""
+        piece += ["W", "B"][switch]
+        dest = ""       # Destination of the given move
+        if(move[0] in ["R", "N", "B", "Q", "K"]):
+            piece += move[0]
+            move = move[1:]
+        else:
+            piece += "P"
 
+        # Format: [PieceCode][a-h][x/a-h] or [PieceCode][1-8][x/a-h]
+        if (((move[0] >= 'a' and move[0] <= 'h') or (move[0] >= '1' and move[0] <= '8')) and (move[1] == 'x' or (move[1] >= 'a' and move[1] <= 'h'))):
+            if(move[1] == 'x'):
+
+                # Check every enemy piece on the colomn to find a legal move to play.
+                for i in range(1,9):
+                    if self.getPiece(self.convertPosition(f"{move[0]}{i}")) == piece or self.getPiece(self.convertPosition(f"{chr(ord('a') + i)}{move[0]}")) == piece:
+                        for delta in range(1,9):
+
+                            # [PieceCode][a-h][x/a-h]
+                            if(self.isLegalMove(f"{move[0]}{i}", f"{move[0]}{delta}") and self.isEnemy(self.getPiece( self.convertPosition(f"{move[0]}{delta}")), switch)):
+                                return f"{move[0]}{i}", f"{move[0]}{delta}"
+                            
+                            # [PieceCode][1-8][x/a-h]
+                            elif(self.isLegalMove(f"{chr(ord('a') + i)}{move[0]}", f"{chr(ord('a') + delta)}{move[0]}") and self.isEnemy(self.getPiece( self.convertPosition(f"{chr(ord('a') + delta)}{move[0]}")), switch)):
+                                return f"{chr(ord('a') + i)}{move[0]}", f"{chr(ord('a') + delta)}{move[0]}"
+            else:
+                # Parcours the colomn to find the corresponding piece
+                for i in range(1, 9):
+
+                    # [PieceCode][a-h][x/a-h]
+                    if self.getPiece(self.convertPosition(f"{move[0]}{i}")) == piece:
+                        return f"{move[0]}{i}", f"{move[1]}{i}"
+                    
+                    # [PieceCode][1-8][x/a-h]
+                    elif self.getPiece(self.convertPosition(f"{chr(ord('a') + i)}{move[0]}")) == piece:
+                        return f"{chr(ord('a') + i)}{move[0]}", f"{move[1]}{move[0]}"
+        
