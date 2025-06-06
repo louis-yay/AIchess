@@ -1,43 +1,61 @@
-from saving import save, load
-from Node import Node
-from constructor import constructTree
+from tree.saving import save, load
+from tree.Node import Node
+from tree.constructor import constructTree
+from chessgame import Board
+from random import choice
 
 
-tree = constructTree("models/50")
+# tree = constructTree("sample")
 # save(tree, "models/50PlayerTree.pkl")
-# tree = load("models/50PlayerTree.pkl")
+tree = load("sample/50PlayerTree.pkl")
 
 
-# Game
-# user play the whites
+# Game init
+board = Board()
+
+
+# user play the white
 gamelog = ""
 current = tree
+insideTree = True
 running = True
 
 while running:
     # TODO Check winning conditions
-
+    board.display()
     # User play
     print("\n\n###########################")
-    print(f"Available move for player: {current.getChilds().keys()}")
-    # move = input("user: >>> ")
-    move = list(current.getChilds().keys())[0]
-    print(f"user play: {move}")
-    gamelog += f"{move} "
-    current = current.getChilds()[move]
+    # print(f"Available move for player: {current.getChilds().keys()}")
+    PGN = input("user: >>> ")   
+
+    move = board.convertPgn(PGN, False)
+    board.play(move.origin, move.dest)
+
+    try:
+        current = current.getChilds()[PGN]
+    except KeyError:
+        insideTree = False
+        print("Left the tree.")
+
+    print(f"User player {move.origin} -> {move.dest}")
+    gamelog += f"{PGN} "
+    
 
     # Computer play
-    print(f"Available move for computer: {current.getChilds().keys()}")
-    play = current.getNextMove()
-    if(play == None):
-        print("Computer resign.")
-        running = False
+    if insideTree:
+        PGN = current.getNextMove()
+        move = board.convertPgn(PGN, True)
+        board.play(move.origin, move.dest)
+        current = current.getChilds()[PGN]
+        
     else:
-        gamelog += f"{play} "
-        current = current.getChilds()[play]
-        print("\n\n###########################")
-        print(f"played: {play}")
-        print(f"Current log: [[[ {gamelog} ]]]")
+        move = choice(board.getLegalMoves('B'))
+        board.play(move.origin, move.dest)
+
+    print("\n\n###########################")
+    print(f"Computer played: {move.origin} -> {move.dest}")
+    print(f"Current log: [[[ {gamelog} ]]]")
+        
 
 
     
