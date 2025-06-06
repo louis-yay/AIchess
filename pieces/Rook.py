@@ -1,9 +1,9 @@
-from piece import Piece
+from pieces.piece import Piece
 
 class Rook(Piece):
-    def __init__(self, name, position, color):
+    def __init__(self, position, color):
         self.static = True
-        super().__init__(name, position, color)
+        super().__init__(position, color)
 
     def move(self, newPos):
         self.pos = newPos
@@ -12,3 +12,5 @@ class Rook(Piece):
     def isStatic(self):
         return self.static
     
+    def toString(self):
+        return self.color + 'R'

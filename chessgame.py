@@ -1,8 +1,18 @@
 from math import sqrt, floor
 from position import Position
 from movement import Movement
-from random import choice
 
+from pieces.Empty import Empty
+from pieces.Pawn import Pawn
+from pieces.Rook import Rook
+from pieces.Knight import Knight
+from pieces.Bishop import Bishop
+from pieces.Queen import Queen
+from pieces.King import King
+
+
+# Here we use Position class to describe (x,y) pos
+# We use Movement() class to describe 'a2' -> 'a4' chess movement
 
 
 class Board:
@@ -14,7 +24,7 @@ class Board:
         # R -> Rook & N -> Knight & B -> Bishop & K -> King & Q -> Queen
         self.grid = [
             # a     b    c       d     e     f     g     h   y/x
-            ['WR', '00', '00', '00', 'WK', '00', '00', 'WR'], # 1
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
@@ -23,6 +33,25 @@ class Board:
             ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'], # 7
             ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
+
+        for x in range(8):
+            for y in range(8):
+                color = self.grid[x][y][0]
+                match self.grid[x][y][1:]:
+                    case 'P':
+                        self.grid[x][y] = Pawn((x,y), color)
+                    case 'R':
+                        self.grid[x][y] = Rook((x,y), color)
+                    case 'N':
+                        self.grid[x][y] = Knight((x,y), color)
+                    case 'B':
+                        self.grid[x][y] = Bishop((x,y), color)
+                    case 'Q':
+                        self.grid[x][y] = Queen((x,y), color)
+                    case 'K':
+                        self.grid[x][y] = King((x,y), color)
+                    case _:
+                        self.grid[x][y] = Empty((x,y))
 
     def getGrid(self):
         return self.grid
@@ -99,7 +128,7 @@ class Board:
             return False
         
         self.grid[destPos.x][destPos.y] = self.getPiece(originPos)
-        self.grid[originPos.x][originPos.y] = '00'
+        self.grid[originPos.x][originPos.y] = Empty((originPos.x, originPos.y))
         return True
     
     def display(self):
@@ -129,7 +158,7 @@ class Board:
         for line in self.grid:
 
             for piece in line:
-                print(f"{symbol[piece]} ", end="")  
+                print(f"{symbol[piece.toString()]} ", end="")  
             print(index)
             index += 1
         print("########################") 
@@ -212,8 +241,11 @@ class Board:
         if (origin == None or dest == None):
             return False
         
+        originPiece = originPiece.toString()
+        originPiece = originPiece.toString()
+
         # Check if the piece go to a piece of the same color or to a King
-        if(originPiece[0] == destPiece[0] or destPiece[1] == 'K'):
+        if(originPiece.getColor() == destPiece.getColor() or type(destPiece) == King):
             return False
 
 
@@ -289,7 +321,7 @@ class Board:
         # Find all the player pieces
         for i in range(8):
             for j in range(8):
-                if(self.grid[i][j][0] == color):
+                if(self.grid[i][j].getColor() == color):
 
                     # Check for every square if the move is legal
                     for x in range(8):
@@ -398,6 +430,6 @@ class Board:
 
 b = Board()
 b.display()
-b.play(b.convertPgn("O-O-O"))
+b.play(b.convertPgn("e4"))
 b.display()
 
