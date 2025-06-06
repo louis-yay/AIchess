@@ -14,7 +14,7 @@ class Board:
         # R -> Rook & N -> Knight & B -> Bishop & K -> King & Q -> Queen
         self.grid = [
             # a     b    c       d     e     f     g     h   y/x
-            ['WR', 'WN', 'WB', '00', 'WK', '00', '00', 'WR'], # 1
+            ['WR', '00', '00', '00', 'WK', '00', '00', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
@@ -81,6 +81,10 @@ class Board:
         if square == None:
             return None
         return self.grid[square.x][square.y]
+    
+    def setPiece(self, square, piece):
+        pos = self.convertPosition(square)
+        self.grid[pos.x][pos.y] = piece
         
     def movePiece(self, origin, dest):
         """
@@ -168,7 +172,6 @@ class Board:
         
         return True
 
-            
 
     def isLegalMove(self, move):
         # TODO ADD promotion system
@@ -272,6 +275,10 @@ class Board:
                   return floor(origin.distance(dest)) == 1
         return False
     
+
+    def isChess(self, color='W'):
+        return False
+
     def getLegalMoves(self, color):
         """
         Return a liste of legal move the current player can use
@@ -287,7 +294,7 @@ class Board:
                     # Check for every square if the move is legal
                     for x in range(8):
                         for y in range(8):
-                            if(self.isLegalMove(f"{chr(ord('a') + j)}{i + 1}", f"{chr(ord('a') + y)}{x + 1}")):
+                            if(self.isLegalMove(Movement(f"{chr(ord('a') + j)}{i + 1}", f"{chr(ord('a') + y)}{x + 1}"))):
                                 moves.append(Movement(f"{chr(ord('a') + j)}{i + 1}", f"{chr(ord('a') + y)}{x + 1}", None))
                     
         return moves
@@ -297,7 +304,27 @@ class Board:
         Play a move is legal, use chess notation
         Return True if the move is played, false howerver.
         """
-        if(self.isLegalMove(move.origin, move.dest)):
+        if(self.isLegalMove(move)):
+            if(move.origin[1:] == "O-O"):
+                if move.origin[0] == 'W':
+                    line = 1
+                else:
+                    line = 8
+                self.movePiece(f"e{line}", f"f{line}") # Move king
+                self.movePiece(f"f{line}", f"g{line}")
+                self.setPiece(f"f{line}", f"{move.origin[0]}R") # Move rook
+                self.setPiece(f"h{line}", '00')
+
+            elif(move.origin[1:] == "O-O-O"):
+                if move.origin[0] == 'W':
+                    line = 1
+                else:
+                    line = 8
+                self.movePiece(f"e{line}", f"d{line}") # Move king
+                self.movePiece(f"d{line}", f"c{line}")
+                self.setPiece(f"d{line}", f"{move.origin[0]}R") # Move rook
+                self.setPiece(f"a{line}", '00')
+
             self.movePiece(move.origin, move.dest)
             return True
         return False
@@ -354,7 +381,7 @@ class Board:
             for i in range(8):
                 for j in range(8):
                     if(self.grid[i][j] == piece):
-                        if self.isLegalMove(f"{chr(ord('a') + j)}{i + 1}", f"{PGN[0]}{PGN[1]}"):
+                        if self.isLegalMove(Movement(f"{chr(ord('a') + j)}{i + 1}", f"{PGN[0]}{PGN[1]}")):
                             output.origin = f"{chr(ord('a') + j)}{i + 1}"
 
         output.dest = f"{PGN[0]}{PGN[1]}"
@@ -370,4 +397,7 @@ class Board:
 
 
 b = Board()
-print(b.isLegalMove(b.convertPgn("O-O")))
+b.display()
+b.play(b.convertPgn("O-O-O"))
+b.display()
+
