@@ -1,13 +1,13 @@
-from tree.saving import save, load
-from tree.Node import Node
-from tree.constructor import constructTree
+from saving import save, load
+from Node import Node
+from constructor import constructTree
 from chessgame import Board
 from random import choice
 
 
 # tree = constructTree("sample")
 # save(tree, "models/50PlayerTree.pkl")
-tree = load("sample/50PlayerTree.pkl")
+tree = load("models/50PlayerTree.pkl")
 
 
 # Game init
@@ -29,7 +29,7 @@ while running:
     PGN = input("user: >>> ")   
 
     move = board.convertPgn(PGN, False)
-    board.play(move.origin, move.dest)
+    board.play(move)
 
     try:
         current = current.getChilds()[PGN]
@@ -50,7 +50,7 @@ while running:
         
     else:
         move = choice(board.getLegalMoves('B'))
-        board.play(move.origin, move.dest)
+        board.play(move)
 
     print("\n\n###########################")
     print(f"Computer played: {move.origin} -> {move.dest}")

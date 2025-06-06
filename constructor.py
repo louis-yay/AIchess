@@ -81,5 +81,3 @@ def constructTree(DIR):
                 current.updateWin("draw")
     print(tree.getChilds())
     return tree
-
-constructTree("data")
