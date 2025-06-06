@@ -14,7 +14,7 @@ class Board:
         # R -> Rook & N -> Knight & B -> Bishop & K -> King & Q -> Queen
         self.grid = [
             # a     b    c       d     e     f     g     h   y/x
-            ['WR', 'WN', 'WB', 'WK', 'WQ', 'WB', 'WN', 'WR'], # 1
+            ['WR', 'WN', 'WB', '00', 'WK', '00', '00', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
@@ -170,15 +170,37 @@ class Board:
 
             
 
-    def isLegalMove(self, origin, dest):
+    def isLegalMove(self, move):
         # TODO ADD promotion system
 
         """
         Take 2 chess position and check if the move is legal or not.
         """
-        
-        origin = self.convertPosition(origin)
-        dest = self.convertPosition(dest)
+
+        # ROCK
+        if(move.origin[1:]  == "O-O" or move.origin[1:] == "O-O-O"):
+            if move.origin[0] == 'W':
+                line = 1
+            else:
+                line = 8
+            return ((
+                    self.getPiece(self.convertPosition(f"e{line}")) == f"{move.origin[0]}K" and
+                    self.getPiece(self.convertPosition(f"f{line}")) == "00" and
+                    self.getPiece(self.convertPosition(f"g{line}")) == "00" and
+                    self.getPiece(self.convertPosition(f"h{line}")) == f"{move.origin[0]}R" and 
+                    move.origin[1:] == 'O-O')
+                or 
+                    (self.getPiece(self.convertPosition(f"e{line}")) == f"{move.origin[0]}K" and
+                    self.getPiece(self.convertPosition(f"d{line}")) == "00" and
+                    self.getPiece(self.convertPosition(f"c{line}")) == "00" and
+                    self.getPiece(self.convertPosition(f"b{line}")) == "00" and 
+                    self.getPiece(self.convertPosition(f"a{line}")) == f"{move.origin[0]}R" and 
+                    move.origin[1:] == 'O-O-O')
+                )
+
+    
+        origin = self.convertPosition(move.origin)
+        dest = self.convertPosition(move.dest)
 
         originPiece = self.getPiece(origin)
         destPiece = self.getPiece(dest)
@@ -270,13 +292,13 @@ class Board:
                     
         return moves
     
-    def play(self, origin, dest):
+    def play(self, move):
         """
         Play a move is legal, use chess notation
         Return True if the move is played, false howerver.
         """
-        if(self.isLegalMove(origin, dest)):
-            self.movePiece(origin, dest)
+        if(self.isLegalMove(move.origin, move.dest)):
+            self.movePiece(move.origin, move.dest)
             return True
         return False
 
@@ -286,37 +308,48 @@ class Board:
         the switch paramater define the player playing, fakse for white, true for black
         We parcour all the piece that match the targeted type, and we check if the move is legal, the first piece with a legal move is moved.
         """
-        if PGN == "O-O":
-            pass    # Small rock
-        if PGN == "O-O-O":
-            pass    # Big rock
 
         # Piece analysis
         piece = ["W", "B"][switch]
         output = Movement()
+
+        if PGN == "O-O" or PGN == 'O-O-O': # Small rock & big rock
+            output.origin = piece + PGN
+            return output    
+
+
         if(PGN[0] in ["R", "N", "B", "Q", "K"]):
             piece += PGN[0]
             PGN = PGN[1:]
         else:
             piece += "P"
+
+
+        
         
         ### PRECISION SI 2 PIECE PEUVENT FINIR AU MEME ENDROIT.
-        #  la pièce vient de cette colonne
+        #  la pièce vient de la colonne désigné par la lette
         if((PGN[0] >= 'a' and PGN[0] <= 'h') and ((PGN[1] >= 'a' and PGN[1] <= 'h') or PGN[1] == 'x')):
             for i in range(1,9):
                 if self.getPiece(self.convertPosition(f"{PGN[0]}{i}")) == piece:
                     output.origin = f"{PGN[0]}{i}"
                     PGN = PGN[1:]
                     break
+
+        # La pièce vient de la ligne désigné par le chiffre
         elif((PGN[0] >= '1' and PGN[0] <= '8')) and (PGN[1] == 'x' or (PGN[1] >= 'a' and PGN[1] <= 'h')):
             for i in range(1,9):
                 if self.getPiece(self.convertPosition(f"{chr(ord('a') + i)}{PGN[0]}")) == piece:
                     output.origin = f"{chr(ord('a') + i)}{PGN[0]}"
                     PGN = PGN[1:]
                     break
+
+        # La pièce vient de la case désigné par la lettre et le chiffre  
         elif((PGN[0] >= 'a' and PGN[0] <= 'h') and (PGN[1] >= '1' and PGN[1] <= '8') and len(PGN) > 2 and ((PGN[2] >= 'a' and PGN[2] <= 'h') or PGN[1] == 'x')):
                 output.origin = f"{PGN[0]}{PGN[1]}"
                 PGN = PGN[2:]
+
+        # Analyse des coordonées du déplacement
         else:
             for i in range(8):
                 for j in range(8):
@@ -336,12 +369,5 @@ class Board:
         return output
 
 
-        
-
-
-
-            
-
-                    
-
-
+b = Board()
+print(b.isLegalMove(b.convertPgn("O-O")))
