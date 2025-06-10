@@ -7,6 +7,10 @@ On utilisera ensuite les N-grams. (développer)
 Puis enfin on constuira un réseau de neuronne. (développer)
 
 ## Arbre
+On considère l'arbre comme étant une superposition des meilleurs parties des meilleurs joueurs.
+En construisant l'arbre, on permet à l'ordinateur de jouer 3 coups comme Kasparov, puis 5 coups comme Karpov, etc...
+L'ordinateur change de casquette en fonctions des coups joué par le joueur.
+
 ### Récupération et traitement des données
 Pour analyser et utiliser les données de parties joué par les meilleurs joueurs d'échecs, on utilisera des fichiers au format `.pgn`. Le format `pgn` est un format texte. 
 Les informations sont rangé par fichier et par joueurs. Chaque joueur à une liste de partie. Chaque partie est enregistré selon le format suivant:
