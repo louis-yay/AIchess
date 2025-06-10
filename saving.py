@@ -1,5 +1,5 @@
 import pickle
-import Node
+from Node import Node
 
 def save(tree, path):
     print("Saving data...")
@@ -8,6 +8,7 @@ def save(tree, path):
 
 
 def load(path):
+    # TODO: Build 2 same tree, save and load one, check if there are the same.
     print("loading data...")
     with open(path, 'rb') as input:
         return pickle.load(input)

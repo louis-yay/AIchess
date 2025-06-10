@@ -67,6 +67,26 @@ ainsi qu'une liste de fils représentant les coups suivant que l'on peut représ
 Pour construire l'arbre, vous pouvez insérer partie par partie, en revenant à la racine de l'arbre entre chaque parties. Enfin, il faudra mettre à jour chaque noeud déjà existant afin de comptabiliser le nombre de parties joué et quel est l'issue de ces dernières.
 
 **ATTENTION:** Si vous avez télécharger l'ensemble des parties des meilleurs joueurs, vous vous trouverez avec prêt de 250 fichier pour un total de plus de 480000 parties et 4 Millions de coups ! En fonction de l'optimisation de votre algo de construction d'arbre, la mémoire vive de l'ordinateur peut saturer rapidement !
+Un moyen de tester l'augmentation de la taille de nos arbre est de les sauvegarder sous forme de *[pickle]*()
+On peut ensuite écrire facilement un algo qui génère plusieurs arbre sous forme de fichier `.pkl`, et on peut ensuite évaluer leurs taille:
+
+```py
+from Node import Node
+from saving import save
+from constructor import constructTree
+
+# On construire 20 Arbre de taille croissante
+for i in range(0, 201, 10):
+    print(f"Tree N°{i}")
+    tree = constructTree("data", max=i)
+    save(tree, f"models/{i}PlayerTree.pkl")
+    del tree
+
+```
+Notez que la taille obtenue par les fichiers n'est pas la taille réel de l'arbre. En effet, la librairie Pickle utilise un grand niveau de compression lors de la création de tels fichiers.
+
+### Evaluation du meilleur coup
+Pour évaluer le meilleur coup possible 
 
 ### Problématique et amélioration
 Si nous jouons avec "l'IA" que nous venons de créer, nous pouvons constater qu'elle est très rapidement limité, il y possible de lui ajouter une fonction random, lui permetant de générer aléatoirement un coup, cependant, cela implique de créer un model de jeu d'échec, et ne résout pas le problème inital: lorsque l'on arrive au bout de l'arbre, l'IA ne peut plus jouer.

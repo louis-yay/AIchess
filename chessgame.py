@@ -14,7 +14,7 @@ class Board:
         # R -> Rook & N -> Knight & B -> Bishop & K -> King & Q -> Queen
         self.grid = [
             # a     b    c       d     e     f     g     h   y/x
-            ['WR', '00', '00', '00', 'WK', '00', '00', 'WR'], # 1
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
@@ -36,7 +36,7 @@ class Board:
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
-            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', '00', 'BP'], # 7
+            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'], # 7
             ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
         
@@ -125,7 +125,7 @@ class Board:
 
         index = 1
         print("########################")
-        print("a b c d e f g h")
+        print("h g f e d c b a")
         for line in self.grid:
 
             for piece in line:
@@ -336,6 +336,8 @@ class Board:
         We parcour all the piece that match the targeted type, and we check if the move is legal, the first piece with a legal move is moved.
         """
 
+        #FIXME dxe4 not suported (might be more)
+
         # Piece analysis
         piece = ["W", "B"][switch]
         output = Movement()
@@ -394,10 +396,3 @@ class Board:
                 output.promotion == PGN[1]
 
         return output
-
-
-b = Board()
-b.display()
-b.play(b.convertPgn("O-O-O"))
-b.display()
-

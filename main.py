@@ -5,9 +5,9 @@ from chessgame import Board
 from random import choice
 
 
-# tree = constructTree("sample")
-# save(tree, "models/50PlayerTree.pkl")
-tree = load("models/50PlayerTree.pkl")
+tree = constructTree("data", max=100)
+# save(tree, "models/70PlayerTree.pkl")
+# tree = load("models/70PlayerTree.pkl")
 
 
 # Game init
@@ -17,6 +17,7 @@ board = Board()
 # user play the white
 gamelog = ""
 current = tree
+playerStart = True
 insideTree = True
 running = True
 
@@ -28,7 +29,9 @@ while running:
     # print(f"Available move for player: {current.getChilds().keys()}")
     PGN = input("user: >>> ")   
 
-    move = board.convertPgn(PGN, False)
+    print(current.getChilds())
+
+    move = board.convertPgn(PGN, not playerStart)
     board.play(move)
 
     try:
@@ -38,19 +41,22 @@ while running:
         print("Left the tree.")
 
     print(f"User player {move.origin} -> {move.dest}")
-    gamelog += f"{PGN} "
+    # gamelog += f"{PGN} "
     
+    print(current.getChilds())
 
     # Computer play
     if insideTree:
         PGN = current.getNextMove()
-        move = board.convertPgn(PGN, True)
-        board.play(move.origin, move.dest)
+        move = board.convertPgn(PGN, playerStart)
+        board.play(move)
         current = current.getChilds()[PGN]
         
     else:
         move = choice(board.getLegalMoves('B'))
         board.play(move)
+
+    # gamelog += f"{PGN} "
 
     print("\n\n###########################")
     print(f"Computer played: {move.origin} -> {move.dest}")

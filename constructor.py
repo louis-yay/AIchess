@@ -2,24 +2,27 @@ import os
 from Node import Node
 from saving import load, save
 
-def constructTree(DIR):
+def constructTree(DIR, max=1000):
     """
     Construit un arbre de décision étant donnée un dossier contenant une liste de fichier .pgn
     """
     # 1. Create a tab from a game
     data = []
+    index = 0
 
     print("#################################################")
     print("LECTURE DES FICHIERS")
     for file in os.listdir(DIR):
-        with open(DIR + "/" + file, "r", errors='ignore') as file:
-            print(file)
-            # Read only the gameplay part
+        if index < max:
+            with open(DIR + "/" + file, "r", errors='ignore') as file:
+                index += 1
+                #print(file)
+                # Read only the gameplay part
 
-            reader = file.read().split("\n\n")
-            for i in range(1, len(reader), 2):
-                data.append(reader[i])
-        del reader
+                reader = file.read().split("\n\n")
+                for i in range(1, len(reader), 2):
+                    data.append(reader[i])
+            del reader
 
 
     # On remplace les retour à la ligne par des espaces
@@ -28,7 +31,7 @@ def constructTree(DIR):
     print("EXTRACTION DES COUPS:")
 
     for i in range(len(data)):
-        print(f'Extraction des coups: {round(i/len(data)*100)}%')
+        # print(f'Extraction des coups: {round(i/len(data)*100)}%')
         
         data[i] = data[i].replace("\n", " ")
         data[i] = data[i].replace("+", "")      # Don't keep the chess note
@@ -42,13 +45,9 @@ def constructTree(DIR):
     print("#################################################")
     print("FORMATAGE DES COUPS:")
 
-    nbMove = 0
-
     # Formatage d'un coup en retirant le numéro de manche
     for i in range(len(data)):
-        print(f'Formatage des coups: {round(i/len(data)*100)}%')
         for j in range(len(data[i])-1):
-            nbMove += 1
             move = data[i][j].split(".")
             try:
                 final[i].append(move[1])
@@ -61,13 +60,15 @@ def constructTree(DIR):
 
     # Définition de l'arbre
     tree = Node()
-    index = 0
 
+    # Final = Liste de toutes les parties
+    # Game = Liste de coup
     # Contruction de l'arbre
+
+    print("#################################################")
+    print("CONSTRUCTION DE L'ARBRE:")
     for game in final:
         current = tree
-        index += 1
-        print(f"Contruction de l'arbre: {round(index/len(final)*100)}%")
         for n in range(len(game)):
             if (game[n] in current.getChilds()):
                 current = current.getChilds()[game[n]]
@@ -79,5 +80,4 @@ def constructTree(DIR):
                 current.updateWin("black")
             else:
                 current.updateWin("draw")
-    print(tree.getChilds())
     return tree

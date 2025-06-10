@@ -1,9 +1,14 @@
 class Node:
+
+  WHITE = True
+  BLACK = False
+
   def __init__(self, whiteWon=0, blackWon=0, draw=0):
     self.gameCount = 0
     self.whiteWon = whiteWon
     self.blackWon = blackWon
     self.draw = draw
+    # self.turn = self.BLACK
     self.childs = {}
 
   def getCount(self):
@@ -18,8 +23,8 @@ class Node:
   def getDraw(self):
     return self.draw
   
-  def getRatio(self, white = True):
-    if(white):
+  def getRatio(self, turn):
+    if(turn == self.WHITE):
       return self.whiteWon/self.gameCount
     return self.blackWon/self.gameCount
   
@@ -37,9 +42,9 @@ class Node:
     max = -1
     next = None
     for move in self.childs.keys():
-      if(self.childs[move].getRatio() > max):
+      if(self.childs[move].getRatio(self.BLACK) > max):
         next = move
-        max = self.childs[move].getRatio()
+        max = self.childs[move].getRatio(self.BLACK)
     return next
 
   def updateWin(self, status):
