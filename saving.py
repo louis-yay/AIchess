@@ -1,10 +1,9 @@
 import pickle
-import Node
 
-def save(tree, path):
+def save(NGram, path):
     print("Saving data...")
     with open(path, "wb") as output:
-        pickle.dump(tree, output, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(NGram, output, pickle.HIGHEST_PROTOCOL)
 
 
 def load(path):
