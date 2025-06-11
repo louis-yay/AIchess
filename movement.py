@@ -7,3 +7,6 @@ class Movement:
         
     def toTuple(self):
         return self.origin,self.dest,self.promotion
+    
+    def equal(self, move):
+        return self.origin == move.origin and self.dest == move.dest and self.promotion == move.promotion

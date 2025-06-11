@@ -395,9 +395,3 @@ class Board:
 
         return output
 
-
-b = Board()
-b.display()
-b.play(b.convertPgn("O-O-O"))
-b.display()
-
