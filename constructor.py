@@ -83,9 +83,17 @@ def constructNGRam(DIR, max=1000, N=1):
     for game in final:
         index += 1
         # print(f"{index/len(final)*100}%")
-        for n in range(len(game) - 1):
-            current = game[n]
-            next = Move(game[n+1])
+        for i in range(len(game) - (N+1)):
+
+            # Define the key
+            current = []
+            for n in range(N):
+                current.append(game[i+n])
+            
+            current = tuple(current)
+
+            # Move to play
+            next = Move(game[i+N])
             match game[-1]:
                 case "1-0":
                     next.updateWin("white")
@@ -113,18 +121,22 @@ def constructNGRam(DIR, max=1000, N=1):
     return output
 
 
+PROFONDEUR = 5
 
-
-# unGram = constructNGRam("data", 100)
+unGram = constructNGRam("data", 1, N=PROFONDEUR)
 # save(unGram, "models/100PlayerUnGram.pkl")
+print(len(unGram))
 
-unGram = load("models/100PLayerUnGram.pkl")
+# unGram = load("models/100PLayerUnGram.pkl")
+
 
 while True:
+    key = []
     try:
-        entry = [input(">>>")]
-        print(f"AVAILABLE MOVE: {len(unGram[entry])}")
-        for move in unGram[entry]:
+        for i in range(PROFONDEUR):
+            key.append(input(f"Coups N°{i+1}\n>>>"))
+        print(f"AVAILABLE MOVE: {len(unGram[tuple(key)])}")
+        for move in unGram[tuple(key)]:
             print(f"{move.PGN}: {move.ratio(Move.WHITE)*100}%")
 
     except KeyError:
