@@ -123,21 +123,29 @@ def constructNGRam(DIR, max=1000, N=1):
 
 PROFONDEUR = 5
 
-unGram = constructNGRam("data", 1, N=PROFONDEUR)
-# save(unGram, "models/100PlayerUnGram.pkl")
-print(len(unGram))
+multiModal = []
 
-# unGram = load("models/100PLayerUnGram.pkl")
+for i in range(PROFONDEUR):
+    multiModal.append(constructNGRam("data", 1, N=i+1))
 
-
+prof = 4 # Profondeur courante
 while True:
-    key = []
-    try:
-        for i in range(PROFONDEUR):
-            key.append(input(f"Coups N°{i+1}\n>>>"))
-        print(f"AVAILABLE MOVE: {len(unGram[tuple(key)])}")
-        for move in unGram[tuple(key)]:
-            print(f"{move.PGN}: {move.ratio(Move.WHITE)*100}%")
+    if prof == 0:
+        print("FAILURE !")
+        exit()
 
-    except KeyError:
-        print("Move not in files.")
+    # Get input
+    key = []
+    for i in range(PROFONDEUR):
+            key.append(input(f"Coups N°{i+1}\n>>>"))
+    for i in range(prof):
+        try:
+            print(f"AVAILABLE MOVE: {len(multiModal[prof-i][tuple(key)])}")
+            for move in multiModal[prof-i][tuple(key)]:
+                print(f"{move.PGN}: {move.ratio(Move.WHITE)*100}%")
+            prof=4
+            break
+
+        except KeyError:
+            key.pop()
+            print(f"changement de profondeur: {prof-i-1}")
