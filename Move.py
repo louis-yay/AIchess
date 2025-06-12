@@ -1,7 +1,7 @@
 class Move:
 
-    BLACK = False
-    WHITE = True
+    BLACK = True
+    WHITE = False
 
     def __init__(self, PGN):
         self.PGN = PGN

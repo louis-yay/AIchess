@@ -7,6 +7,9 @@ from random import choice
 
 class Board:
 
+    WHITE = False
+    BLACK = True
+
     def __init__(self) -> None:
 
         # NOTATION
@@ -14,23 +17,22 @@ class Board:
         # R -> Rook & N -> Knight & B -> Bishop & K -> King & Q -> Queen
         self.grid = [
             # a     b    c       d     e     f     g     h   y/x
-            ['WR', '00', '00', '00', 'WK', '00', '00', 'WR'], # 1
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
-            ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
+            ['00', '00', '00', '00', 'BP', '00', '00', '00'], # 4
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
             ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'], # 7
             ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
-
     def getGrid(self):
         return self.grid
     
     def resetGrid(self):
         self.grid = [
             # a     b    c       d     e     f     g     h   y/x
-            ['WR', 'WN', 'WB', 'WK', 'WQ', 'WB', 'WN', 'WR'], # 1
+            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 3
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
@@ -50,7 +52,7 @@ class Board:
             return False
         else: return piece[0] == "W"
 
-    def isEnemy(self, piece, switch=False):
+    def isEnemy(self, piece, switch=WHITE):
         """
         Switch false = player play white
         Switch true = player play black
@@ -82,8 +84,10 @@ class Board:
             return None
         return self.grid[square.x][square.y]
     
-    def setPiece(self, square, piece):
-        pos = self.convertPosition(square)
+    def setPiece(self, pos, piece):
+        """
+        Take cartesian position, Position object
+        """
         self.grid[pos.x][pos.y] = piece
         
     def movePiece(self, origin, dest):
@@ -108,12 +112,14 @@ class Board:
         """
         symbol = {
             "BP": '♙',
+            "BPG": 'X',     # Ghost black pawn
             "BN": '♘',
             "BB": '♗',
             "BR": '♖',
             "BQ": '♕',
             "BK": '♔',
             "WP": '♟', 
+            "WPG": 'X',     # Ghost White Pawn
             "WN": '♞',
             "WB": '♝',
             "WR": '♜', 
@@ -133,6 +139,14 @@ class Board:
             print(index)
             index += 1
         print("########################") 
+
+    def removeGhost(self):
+        for i in range(8):
+            for j in range(8):
+                if self.grid[i][j] == "WPG":
+                    self.grid[i][j] = '00'
+                elif self.grid[i][j] == "BPG":
+                    self.grid[i][j] = '00'
 
     def checkDiagonal(self, origin, dest, max=100):
         """
@@ -303,29 +317,57 @@ class Board:
         """
         Play a move is legal, use chess notation
         Return True if the move is played, false howerver.
+        Rock is encoded: [color][small/big rock] in move.origin
         """
         if(self.isLegalMove(move)):
-            if(move.origin[1:] == "O-O"):
+            if(move.origin[1:] == "O-O"):   # Small rock
                 if move.origin[0] == 'W':
                     line = 1
                 else:
                     line = 8
                 self.movePiece(f"e{line}", f"f{line}") # Move king
                 self.movePiece(f"f{line}", f"g{line}")
-                self.setPiece(f"f{line}", f"{move.origin[0]}R") # Move rook
-                self.setPiece(f"h{line}", '00')
+                self.setPiece(self.convertPosition(f"f{line}"), f"{move.origin[0]}R")  # Move rook
+                self.setPiece(self.convertPosition(f"h{line}"), '00')
+                self.removeGhost()
 
-            elif(move.origin[1:] == "O-O-O"):
+            elif(move.origin[1:] == "O-O-O"):   # Big rock
                 if move.origin[0] == 'W':
                     line = 1
                 else:
                     line = 8
                 self.movePiece(f"e{line}", f"d{line}") # Move king
                 self.movePiece(f"d{line}", f"c{line}")
-                self.setPiece(f"d{line}", f"{move.origin[0]}R") # Move rook
-                self.setPiece(f"a{line}", '00')
+                self.setPiece(self.convertPositionf("d{line}"), f"{move.origin[0]}R") # Move rook
+                self.setPiece(self.convertPositionf("a{line}"), '00')
+                self.removeGhost()
 
-            self.movePiece(move.origin, move.dest)
+
+            # Add ghost piece when moving 2
+            elif(self.convertPosition(move.origin).distance(self.convertPosition(move.dest)) == 2 and move.piece[1] == 'P'):
+                self.movePiece(move.origin, move.dest)
+
+                # Format to chess cause it's int here 
+                self.setPiece(
+                    self.convertPosition(f"{move.origin[0]}{round((int(move.origin[1]) + int(move.dest[1])) / 2)}"),
+                    f"{move.piece[0]}PG"
+                ) # Set ghost piece on pawn long start
+
+            # Prise en passant
+            elif(move.piece[1] == "P" and self.getPiece(self.convertPosition(move.dest)) in ["WPG", "BPG"]):
+                pos = self.convertPosition(move.dest)
+                match move.piece[0]:
+                    case 'W':
+                        pos.x -= 1
+                    case 'B':
+                        pos.x += 1
+                self.setPiece(pos, '00')
+                self.movePiece(move.origin, move.dest)
+                self.removeGhost()
+
+            else:
+                self.movePiece(move.origin, move.dest)
+                self.removeGhost()
             return True
         return False
 
@@ -351,9 +393,8 @@ class Board:
         else:
             piece += "P"
 
-
-        
-        
+        output.piece = piece
+                
         ### PRECISION SI 2 PIECE PEUVENT FINIR AU MEME ENDROIT.
         #  la pièce vient de la colonne désigné par la lette
         if((PGN[0] >= 'a' and PGN[0] <= 'h') and ((PGN[1] >= 'a' and PGN[1] <= 'h') or PGN[1] == 'x')):
@@ -381,8 +422,9 @@ class Board:
             for i in range(8):
                 for j in range(8):
                     if(self.grid[i][j] == piece):
-                        if self.isLegalMove(Movement(f"{chr(ord('a') + j)}{i + 1}", f"{PGN[0]}{PGN[1]}")):
+                        if self.isLegalMove(Movement(origin=f"{chr(ord('a') + j)}{i + 1}", dest=f"{PGN[0]}{PGN[1]}")):
                             output.origin = f"{chr(ord('a') + j)}{i + 1}"
+
 
         output.dest = f"{PGN[0]}{PGN[1]}"
         PGN = PGN[2:]

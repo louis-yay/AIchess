@@ -1,6 +1,7 @@
 class Movement:
 
-    def __init__(self, origin='', dest='', promotion=None):
+    def __init__(self, piece = '', origin='', dest='', promotion=None):
+        self.piece = piece
         self.origin = origin
         self.dest = dest
         self.promotion = promotion
