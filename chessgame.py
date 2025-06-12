@@ -23,8 +23,8 @@ class Board:
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
-            ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'], # 7
-            ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
+            ['00', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'], # 7
+            ['00', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
     def getGrid(self):
         return self.grid
@@ -230,6 +230,9 @@ class Board:
         if(originPiece[0] == destPiece[0] or destPiece[1] == 'K'):
             return False
 
+        # Check if promotion item is legal
+        if not move.promotion in ['R', 'N', 'B', 'Q', None]:
+            return False
 
         # Piece are going to empty or enemie piece (except king)
         # TODO finish the rules of the game
@@ -365,6 +368,14 @@ class Board:
                 self.movePiece(move.origin, move.dest)
                 self.removeGhost()
 
+            elif(move.promotion != None):
+                print(f"PROMOTION: {move.promotion}")
+                self.movePiece(move.origin, move.dest)
+                self.setPiece(
+                    self.convertPosition(move.dest),
+                    move.promotion
+                )
+
             else:
                 self.movePiece(move.origin, move.dest)
                 self.removeGhost()
@@ -433,7 +444,20 @@ class Board:
         PGN.replace('x', "")
         if len(PGN) != 0:
             if PGN[0] == '=':
-                output.promotion == PGN[1]
+                output.promotion = f"{output.piece[0]}{PGN[1]}"
 
         return output
 
+b = Board()
+b.display()
+
+for i in range(3,8):
+    input()
+    print(f"Player: a{i}")
+    b.play(b.convertPgn(f"a{i}"))
+    b.display()
+
+
+input()
+b.play((b.convertPgn("a8=E")))
+b.display()
