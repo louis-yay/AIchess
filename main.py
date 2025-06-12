@@ -4,7 +4,7 @@ from constructor import constructNGRam
 from Move import Move
 import time
 
-PROFONDEUR = 5
+PROFONDEUR = 10
 
 # Game init
 board = Board()
@@ -32,6 +32,7 @@ def nextMove(input: list):
                     responses.append(move)
             if len(responses) > 0:
                 return random.choice(responses)
+        print(f"DECREASE: {level} -> {level-1}")
         input.pop()
     
     print("COMPUTER RESIGN.")
@@ -53,8 +54,14 @@ while running:
     # User play
     print("\n\n###########################")
     PGN = input("user: >>> ")   
-
     move = board.convertPgn(PGN, board.WHITE)
+
+    # Warn the player is move is illegal
+    while not board.isLegalMove(move):
+        print("INVALID MOVE")
+        PGN = input("user: >>> ")
+        move = board.convertPgn(PGN, board.WHITE)
+
     board.play(move)
 
     print(f"User player {move.origin} -> {move.dest}")
