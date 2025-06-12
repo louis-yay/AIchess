@@ -26,5 +26,5 @@ class Move:
        if player == self.WHITE:
           return self.whiteWon/self.gameCount
        else:
-          return self.blackWon/self.ratio
+          return self.blackWon/self.gameCount
     

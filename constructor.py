@@ -13,8 +13,6 @@ def constructNGRam(DIR, max=1000, N=1):
     data = []
     index = 0
 
-    print("#################################################")
-    print("LECTURE DES FICHIERS")
     for file in os.listdir(DIR):
         if index < max:
             with open(DIR + "/" + file, "r", errors='ignore') as file:
@@ -30,8 +28,6 @@ def constructNGRam(DIR, max=1000, N=1):
 
     # On remplace les retour à la ligne par des espaces
     # Split pour récupérer les coups un à un
-    print("#################################################")
-    print("EXTRACTION DES COUPS")
 
     for i in range(len(data)):
         # print(f'Extraction des coups: {round(i/len(data)*100)}%')
@@ -45,10 +41,6 @@ def constructNGRam(DIR, max=1000, N=1):
         
 
     final = [ [] for i in range(len(data))]
-
-# 32. Rf1 Qf1
-    print("#################################################")
-    print("FORMATAGE DES COUPS")
 
     # Formatage d'un coup en retirant le numéro de manche
     for i in range(len(data)):
@@ -73,8 +65,6 @@ def constructNGRam(DIR, max=1000, N=1):
 
     del data
 
-    print("#################################################")
-    print("CONSTRUCTION DU 1-GRAM")
     output = {}
 
 
@@ -121,31 +111,4 @@ def constructNGRam(DIR, max=1000, N=1):
     return output
 
 
-PROFONDEUR = 5
 
-multiModal = []
-
-for i in range(PROFONDEUR):
-    multiModal.append(constructNGRam("data", 1, N=i+1))
-
-prof = 4 # Profondeur courante
-while True:
-    if prof == 0:
-        print("FAILURE !")
-        exit()
-
-    # Get input
-    key = []
-    for i in range(PROFONDEUR):
-            key.append(input(f"Coups N°{i+1}\n>>>"))
-    for i in range(prof):
-        try:
-            print(f"AVAILABLE MOVE: {len(multiModal[prof-i][tuple(key)])}")
-            for move in multiModal[prof-i][tuple(key)]:
-                print(f"{move.PGN}: {move.ratio(Move.WHITE)*100}%")
-            prof=4
-            break
-
-        except KeyError:
-            key.pop()
-            print(f"changement de profondeur: {prof-i-1}")
