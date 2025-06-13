@@ -1,6 +1,6 @@
 from chessgame import Board
 import random
-from constructor import constructNGRam
+from Nconstructor import constructNGRam
 from Move import Move
 import time
 from saving import save, load
