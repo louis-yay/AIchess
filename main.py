@@ -3,18 +3,32 @@ import random
 from constructor import constructNGRam
 from Move import Move
 import time
+from saving import save, load
 
-PROFONDEUR = 10
+PROFONDEUR = 9
 
 # Game init
 board = Board()
 
 
 # Ngram Init
-multiModal = []
-for i in range(PROFONDEUR):
-    print(f"Formation of the {i+1}-GRAM...")
-    multiModal.append(constructNGRam("data", 1, N=i+1))
+# multiModal = []
+# for i in range(PROFONDEUR):
+#     """
+#     Avec une profondeur donnée, génère une liste de model de N-Gram sous la forme suivante:
+#     1-Gram formé sur 100 Joueurs
+#     2-Gram formé sur 90 joueurs
+#     ...
+#     N-Gram formé sur (90-N*10) Joueurs
+#     """
+#     print(f"Formation of the {i+1}-GRAM...")
+#     multiModal.append(constructNGRam("data", 100-i*10, N=i+1))
+# 
+# for model in multiModal:
+#     print(len(model.keys()[0]))
+# 
+# save(multiModal, "models/multiModal10Layer.pkl")
+multiModal = load("models/multiModal10Layer.pkl")
 
 def nextMove(input: list):
     """
@@ -56,7 +70,7 @@ while running:
     PGN = input("user: >>> ")   
     move = board.convertPgn(PGN, board.WHITE)
 
-    # Warn the player is move is illegal
+    # Warn the player if move is illegal
     while not board.isLegalMove(move):
         print("INVALID MOVE")
         PGN = input("user: >>> ")
