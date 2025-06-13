@@ -85,6 +85,7 @@ def _build(dataSet, output, depth, history = []):
                 if isCombValid:
                     if game[i] in output.getChilds():
                         winUpdate.append(output)
+                        winUpdate.append(output.getChilds()[game[i]])
                     else:
                         output.addChilds(game[i], next)
                     for elt in winUpdate:
@@ -103,6 +104,6 @@ def _build(dataSet, output, depth, history = []):
     return output
 
 
-tree = constructNGRam("data", 1, 2)
+tree = constructNGRam("data",1, 1)
 for elt in tree.getChilds().keys():
-    print(f"MOVE: {elt} -> {tree.getChilds[elt].ratio()}%")
+    print(f"MOVE: {elt} -> {len(tree.getChilds()[elt].getChilds())} Solutions")

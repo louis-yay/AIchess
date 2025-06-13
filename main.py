@@ -80,7 +80,7 @@ while running:
 
     print(f"User player {move.origin} -> {move.dest}")
     board.display()
-    time.sleep(1)
+    # time.sleep(1)
 
     gamelog.append(PGN)
 
