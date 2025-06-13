@@ -2,6 +2,7 @@ import os
 from Move import Move
 from saving import load, save
 from chessgame import Board
+from Node import Node
 
 # Maximal asbtraction version
 
@@ -65,50 +66,43 @@ def constructNGRam(DIR, max=1000, N=1):
 
     del data
 
-    output = {}
+    output = Node(PGN=None)
+    return _build(final, output, N)
 
 
-# Dict PGN -> Move Object
-    index = 0
-    for game in final:
-        index += 1
-        # print(f"{index/len(final)*100}%")
-        for i in range(len(game) - (N+1)):
 
-            # Define the key
-            current = []
-            for n in range(N):
-                current.append(game[i+n])
-            
-            current = tuple(current)
+def _build(dataSet, output, depth, history = []):
+    if depth > 0:
+        for game in dataSet:
+            for i in range(len(game)-1-len(history)):     # for move in game
+                next = Node(game[i])
+                winUpdate = [next]
+                isCombValid = True
+                for checkIndex in range(len(history)):
+                    if game[i+checkIndex] != history[checkIndex]:
+                        isCombValid = False
 
-            # Move to play
-            next = Move(game[i+N])
-            match game[-1]:
-                case "1-0":
-                    next.updateWin("white")
-                case "0-1":
-                    next.updateWin("black")
-                case "1/2-1/2":
-                    next.updateWin("draw")
-            
-            if(current in output):
-                exist = False
-                for elt in output[current]:
-                    if next.equal(elt):
-                        elt.whiteWon += next.whiteWon
-                        elt.blackWon += next.blackWon
-                        elt.draw += next.draw
-                        elt.gameCount += next.gameCount
-                        exist = True
-                        break
-
-                if not exist:
-                    output[current].append(next)
-            else:
-                output[current] = [next]
+                if isCombValid:
+                    if game[i] in output.getChilds():
+                        winUpdate.append(output)
+                    else:
+                        output.addChilds(game[i], next)
+                    for elt in winUpdate:
+                            match game[-1]:
+                                case "1-0":
+                                    elt.updateWin("white")
+                                case "0-1":
+                                    elt.updateWin("black")
+                                case "1/2-1/2":
+                                    elt.updateWin("draw")
+                    winUpdate.clear()
+                    history.append(game[i+len(history)])
+                    _build(dataSet, next, depth-1, history)
+                    history = []
 
     return output
 
 
-
+tree = constructNGRam("data", 1, 2)
+for elt in tree.getChilds().keys():
+    print(f"MOVE: {elt} -> {tree.getChilds[elt].ratio()}%")
