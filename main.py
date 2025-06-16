@@ -1,6 +1,6 @@
 from chessgame import Board
 import random
-from Nconstructor import constructNGRam
+from constructor import constructNGRam
 from Move import Move
 import time
 from saving import save, load
@@ -51,12 +51,7 @@ def nextMove(input: list):
     
     print("COMPUTER RESIGN.")
     exit()
-
         
-        
-
-
-
 # user play the white
 gamelog = []
 insideTree = True
