@@ -1,59 +1,57 @@
 class Node:
 
-    BLACK = True
-    WHITE = False
+  WHITE = True
+  BLACK = False
 
-    def __init__(self, PGN):
-        self.PGN = PGN
-        self.whiteWon = 0
-        self.blackWon = 0
-        self.draw = 0
-        self.gameCount = 0
-        self.childs = {}
+  def __init__(self, whiteWon=0, blackWon=0, draw=0):
+    self.gameCount = 0
+    self.whiteWon = whiteWon
+    self.blackWon = blackWon
+    self.draw = draw
+    # self.turn = self.BLACK
+    self.childs = {}
 
-    def getPGN(self):
-        return self.PGN
-    
-    def getChilds(self):
-        return self.childs
-    
-    def addChilds(self, PGN, node) -> bool:
-        """
-        Don't update the winning condition.
-        """
-        if not PGN in self.childs:
-            self.childs[PGN] = node
-            return True
-        return False
-    
-    def updateWin(self, status):
-        if(status == "white"):
-          self.whiteWon += 1
-        elif(status == "black"):
-          self.blackWon += 1
-        elif(status == "draw"):
-          self.draw += 1
-        self.gameCount += 1   
+  def getCount(self):
+    return self.gameCount
+  
+  def getWhite(self):
+    return self.whiteWon
+  
+  def getBlack(self):
+    return self.blackWon
+  
+  def getDraw(self):
+    return self.draw
+  
+  def getRatio(self, turn):
+    if(turn == self.WHITE):
+      return self.whiteWon/self.gameCount
+    return self.blackWon/self.gameCount
+  
+  def getChilds(self): 
+    return self.childs
+  
+  def setChilds(self, newChilds):
+    self.childs = newChilds
 
-    def ratio(self, player=WHITE):
-       if player == self.WHITE:
-          return self.whiteWon/self.gameCount
-       else:
-          return self.blackWon/self.gameCount
-    
-    def getNextMove(self, history: list):
-        """
-        Take a list of move and return a move that matches the most
-        the move history
-        """
-        if(len(history) == 0):
-            exit("INVALID HISTORY")
+  def addChild(self, key, value):
+    self.childs[key] = value
+    return value
+  
+  def getNextMove(self):
+    max = -1
+    next = None
+    for move in self.childs.keys():
+      if(self.childs[move].getRatio(self.BLACK) > max):
+        next = move
+        max = self.childs[move].getRatio(self.BLACK)
+    return next
 
-        pNode = self    # Pointer to current node location
-        while len(history) != 0:
-            current = history.pop(0)
-            if current in pNode.childs:
-                pNode = pNode.childs[current]
-        
-        return pNode.PGN
-
+  def updateWin(self, status):
+    if(status == "white"):
+      self.whiteWon += 1
+    elif(status == "black"):
+      self.blackWon += 1
+    elif(status == "draw"):
+      self.draw += 1
+    self.gameCount += 1      

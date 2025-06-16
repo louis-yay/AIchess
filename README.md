@@ -70,3 +70,10 @@ Pour construire l'arbre, vous pouvez insérer partie par partie, en revenant à 
 
 ### Problématique et amélioration
 Si nous jouons avec "l'IA" que nous venons de créer, nous pouvons constater qu'elle est très rapidement limité, il y possible de lui ajouter une fonction random, lui permetant de générer aléatoirement un coup, cependant, cela implique de créer un model de jeu d'échec, et ne résout pas le problème inital: lorsque l'on arrive au bout de l'arbre, l'IA ne peut plus jouer.
+
+
+### STAT N-GRAM
+
+barplot / boxplot (boite à moustache)
+diff taille arbre / gram
+coubre de taille des N-gram en fct du nb de partie
