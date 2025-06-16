@@ -1,57 +1,62 @@
+import os
 import matplotlib.pyplot as plt
+from saving import save
 from Nconstructor import constructNGRam
+from treecontrustor import constructTree
 
-size1 = {}
-# size2 = {}
-# size3 = {}
-# size4 = {}
+def convert_bytes_to_MB(num):
+    """
+    this function will convert bytes to MB.... GB... etc
+    """
+    return round(num/(1024**2),2)
+
+
+def file_size(file_path):
+    """
+    this function will return the file size
+    """
+    if os.path.isfile(file_path):
+        file_info = os.stat(file_path)
+        return convert_bytes_to_MB(file_info.st_size)
+
+
+gram1Size = {}
+gram2Size = {}
+gram3Size = {}
+treeSize = {}
 
 # analyse of size and nulber of combinaison found
-for i in range(50, 10000, 100):
+for i in range(50, 5000, 100):
     print(i)
-    Gram1 = constructNGRam("data", max=i, N=1)
-#     Gram2 = constructNGRam("data", max=i, N=2)
-#     Gram3 = constructNGRam("data", max=i, N=3)
-#     Gram4 = constructNGRam("data", max=i, N=4)
-    size1[i] = len(Gram1)
-#     size2[i] = len(Gram2)
-#     size3[i] = len(Gram3)
-#     size4[i] = len(Gram4)
-#     for key in Gram1.keys():
-#         size1[i] += len(Gram1[key])
-#     
-#     for key in Gram2.keys():
-#         size2[i] += len(Gram2[tuple(key)])
-# 
-#     for key in Gram3.keys():
-#         size3[i] += len(Gram3[tuple(key)])
-# 
-#     for key in Gram4.keys():
-#         size4[i] += len(Gram4[tuple(key)])
-# 
-# 
-# 
-plt.plot(size1.keys(), size1.values(), label="1-GRAM")
-# plt.plot(size2.keys(), size2.values(), label="2-GRAM")
-# plt.plot(size3.keys(), size3.values(), label="3-GRAM")
-# plt.plot(size4.keys(), size4.values(), label="4-GRAM")
-plt.ylabel('Nombre de coup trouvé')
-plt.xlabel("Nombre de partie")
 
-# Analyse of the size of the N-Gram for 1000 games, by the size of N
-# data = {}
-# 
-# for i in range(1, 21):
-#     print(i)
-#     gram = constructNGRam("data", max=2000, N=i)
-#     total = len(gram)
-#     for key in gram.keys():
-#         total += len(gram[key])
-#     data[i] = total
-# 
-# plt.plot(data.keys(), data.values())
-# plt.ylabel("Taille du N-Gram pour 2000 parties")
-# plt.xlabel("N")
-# plt.legend()
-# 
+    # 1-Gram file size
+    # Gram1 = constructNGRam("data", max=i, N=1)
+    # save(Gram1, f"models/stat/gram{i}.pkl")
+    gram1Size[i] = file_size(f"models/stat/gram{i}.pkl")
+
+    # 2-Gram file size
+    # Gram2 = constructNGRam("data", max=i, N=2)
+    # save(Gram2, f"models/stat/2gram{i}.pkl")
+    gram2Size[i] = file_size(f"models/stat/2gram{i}.pkl")
+
+    # 3-Gram file size
+    # Gram3 = constructNGRam("data", max=i, N=3)
+    # save(Gram3, f"models/stat/3gram{i}.pkl")
+    gram3Size[i] = file_size(f"models/stat/3gram{i}.pkl")
+
+    # Tree file size
+    # Tree = constructTree("data", max=i)
+    # save(Tree, f"models/stat/tree{i}.pkl")
+    treeSize[i] = file_size(f"models/stat/tree{i}.pkl")
+    
+
+plt.plot(gram1Size.keys(), gram1Size.values(), label="1-GRAM")
+plt.plot(gram2Size.keys(), gram2Size.values(), label="2-GRAM")
+plt.plot(gram3Size.keys(), gram3Size.values(), label="3-GRAM")
+plt.plot(treeSize.keys(), treeSize.values(), label="TREE")
+plt.ylabel('Taille en MB')
+plt.xlabel("Nombre de partie")
+plt.legend()
+
+
 plt.show()

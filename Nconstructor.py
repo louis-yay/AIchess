@@ -7,7 +7,7 @@ from chessgame import Board
 
 def constructNGRam(DIR, max=1000000, N=1):
     """
-    Construit un arbre de décision étant donnée un dossier contenant une liste de fichier .pgn
+    Construit un N-Gram de décision étant donnée un dossier contenant une liste de fichier .pgn
     max correspond au nombre de partie étudié
     N Correspond à la taille de notre N-Gram
     """
