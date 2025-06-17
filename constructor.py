@@ -14,17 +14,17 @@ def constructNGRam(DIR, max=1000, N=1):
     data = []
     index = 0
 
-    for file in os.listdir(DIR):
-        if index < max:
-            with open(DIR + "/" + file, "r", errors='ignore') as file:
-                index += 1
-                #print(file)
-                # Read only the gameplay part
-
-                reader = file.read().split("\n\n")
-                for i in range(1, len(reader), 2):
+    for file in sorted(os.listdir(DIR)):
+        with open(DIR + "/" + file, "r", errors='ignore') as file:
+            index += 1
+            #print(file)
+            # Read only the gameplay part
+            reader = file.read().split("\n\n")
+            for i in range(1, len(reader), 2):
+                if index < max:
                     data.append(reader[i])
-            del reader
+                    index += 1
+        del reader
 
 
     # On remplace les retour à la ligne par des espaces
@@ -75,35 +75,29 @@ def _build(dataSet, output, depth, history = []):
     if depth > 0:
         for game in dataSet:
             for i in range(len(game)-1-len(history)):     # for move in game
-                next = Node(game[i])
-                winUpdate = [next]
+                next = Node(game[i + len(history)])
+                
                 isCombValid = True
                 for checkIndex in range(len(history)):
                     if game[i+checkIndex] != history[checkIndex]:
                         isCombValid = False
+                        break
 
                 if isCombValid:
-                    if game[i] in output.getChilds():
-                        winUpdate.append(output)
-                        winUpdate.append(output.getChilds()[game[i]])
-                    else:
-                        output.addChilds(game[i], next)
-                    for elt in winUpdate:
-                            match game[-1]:
-                                case "1-0":
-                                    elt.updateWin("white")
-                                case "0-1":
-                                    elt.updateWin("black")
-                                case "1/2-1/2":
-                                    elt.updateWin("draw")
-                    winUpdate.clear()
+                    next = output.addChilds(game[i + len(history)], next)
+                    match game[-1]:
+                        case "1-0":
+                            output.updateWin("white")
+                            next.updateWin("white")
+                        case "0-1":
+                            output.updateWin("black")
+                            next.updateWin("black")
+                        case "1/2-1/2":
+                            output.updateWin("draw")
+                            next.updateWin("draw")
+                            
                     history.append(game[i+len(history)])
                     _build(dataSet, next, depth-1, history)
-                    history = []
+                    history.pop()
 
     return output
-
-
-tree = constructNGRam("data",1, 1)
-for elt in tree.getChilds().keys():
-    print(f"MOVE: {elt} -> {len(tree.getChilds()[elt].getChilds())} Solutions")

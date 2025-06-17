@@ -17,14 +17,13 @@ class Node:
     def getChilds(self):
         return self.childs
     
-    def addChilds(self, PGN, node) -> bool:
+    def addChilds(self, PGN, node):
         """
         Don't update the winning condition.
         """
         if not PGN in self.childs:
             self.childs[PGN] = node
-            return True
-        return False
+        return self.childs[PGN]
     
     def updateWin(self, status):
         if(status == "white"):
