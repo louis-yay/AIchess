@@ -53,6 +53,8 @@ class Node:
             current = history.pop(0)
             if current in pNode.childs:
                 pNode = pNode.childs[current]
+            else:
+               break
         
-        return pNode.PGN
+        return pNode.childs
 

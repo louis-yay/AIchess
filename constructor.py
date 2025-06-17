@@ -67,37 +67,30 @@ def constructNGRam(DIR, max=1000, N=1):
     del data
 
     output = Node(PGN=None)
-    return _build(final, output, N)
+    return _build(final, N)
 
 
 
-def _build(dataSet, output, depth, history = []):
-    if depth > 0:
-        for game in dataSet:
-            for i in range(len(game)-1-len(history)):     # for move in game
-                next = Node(game[i + len(history)])
-                
-                isCombValid = True
-                for checkIndex in range(len(history)):
-                    if game[i+checkIndex] != history[checkIndex]:
-                        isCombValid = False
-                        break
 
-                if isCombValid:
-                    next = output.addChilds(game[i + len(history)], next)
-                    match game[-1]:
-                        case "1-0":
-                            output.updateWin("white")
-                            next.updateWin("white")
-                        case "0-1":
-                            output.updateWin("black")
-                            next.updateWin("black")
-                        case "1/2-1/2":
-                            output.updateWin("draw")
-                            next.updateWin("draw")
-                            
-                    history.append(game[i+len(history)])
-                    _build(dataSet, next, depth-1, history)
-                    history.pop()
+def _build(dataSet, N):
+    output = Node(PGN = None)
+    for game in dataSet:
+        for moveIndex in range(len(game)-N):   
+            pNode = output     # For every move in every game
+            for pgnIndex in range(moveIndex, moveIndex+N):
+                try:
+                    pNode = pNode.getChilds()[game[pgnIndex]]
+                except KeyError:
+                    pNode = pNode.addChilds(game[pgnIndex], Node(game[pgnIndex+1]))
+
+                # Update winning rate
+                match game[-1]:
+                    case "1-0":
+                        pNode.updateWin("white")
+                    case "0-1":
+                        pNode.updateWin("black")
+                    case "1/2-1/2":
+                        pNode.updateWin("draw")  
+
 
     return output

@@ -3,59 +3,49 @@ import random
 from constructor import constructNGRam
 from Move import Move
 import time
+from Node import Node
 from saving import save, load
+import time
 
-PROFONDEUR = 9
+
 
 # Game init
 board = Board()
+start = time.time()
+gram = constructNGRam("data", max=5000, N=5)
+end = time.time()
+
+print(f"Elapsed time: {end - start}s")
 
 
-# Ngram Init
-# multiModal = []
-# for i in range(PROFONDEUR):
-#     """
-#     Avec une profondeur donnée, génère une liste de model de N-Gram sous la forme suivante:
-#     1-Gram formé sur 100 Joueurs
-#     2-Gram formé sur 90 joueurs
-#     ...
-#     N-Gram formé sur (90-N*10) Joueurs
-#     """
-#     print(f"Formation of the {i+1}-GRAM...")
-#     multiModal.append(constructNGRam("data", 100-i*10, N=i+1))
-# 
-# for model in multiModal:
-#     print(len(model.keys()[0]))
-# 
-# save(multiModal, "models/multiModal10Layer.pkl")
-multiModal = load("models/multiModal10Layer.pkl")
-
-def nextMove(input: list):
-    """
-    Génère une liste d'instance de Ngram de plusieurs tailles
-    soit N une profondeur, génère une liste de N elements de profondeur, N, N-1, N-2, ..., 2, 1
-    """
-    print(f"input: {input}")
-    prof = len(input)-1 # Profondeur 
-
-    for level in range(prof, -1, -1):        # Bigger to smaller models
-        if(tuple(input) in multiModal[level]):     # Input in the model
-            responses = []                     
-            for move in multiModal[level][tuple(input)]:                   # For every response to the input
-                if(board.isLegalMove(board.convertPgn(move.PGN, Board.BLACK) )):  # If response is legal we add it to the response list
-                    responses.append(move)
-            if len(responses) > 0:
-                return random.choice(responses)
-        print(f"DECREASE: {level} -> {level-1}")
-        input.pop()
-    
-    print("COMPUTER RESIGN.")
-    exit()
+# save(gram, "models/gram.pkl")
+# gram = load("models/gram.pkl")
         
 # user play the white
 gamelog = []
 insideTree = True
 running = True
+
+
+def next():
+    out = None
+    max = -1
+    PGN = gram.getNextMove(gamelog)        # List of move in the N-Gram
+    for pgn in PGN:
+        move = board.convertPgn(pgn, Board.BLACK)
+        if board.isLegalMove(move) and gram.getChilds()[pgn].ratio(Node.BLACK) > max and gram.getChilds()[pgn].gameCount > 10:
+            out = (move, pgn)
+            max = gram.getChilds()[pgn].ratio(Node.BLACK)
+
+    if out == None:
+        print("Computer Resign")
+        exit()
+    gamelog.append(out[1])
+    
+    return out[0]
+            
+
+
 
 while running:
     # TODO Check winning conditions
@@ -75,15 +65,15 @@ while running:
 
     print(f"User player {move.origin} -> {move.dest}")
     board.display()
-    # time.sleep(1)
 
     gamelog.append(PGN)
 
     print(gamelog)
     
-    PGN = nextMove(gamelog[-PROFONDEUR::]).PGN
-    move = board.convertPgn(PGN, board.BLACK)
+    move = next()
     board.play(move)
+
+    board.display()
 
     gamelog.append(PGN)
 
