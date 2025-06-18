@@ -4,12 +4,12 @@ class Node:
     WHITE = False
 
     def __init__(self, PGN):
-        self.PGN = PGN
-        self.whiteWon = 0
-        self.blackWon = 0
-        self.draw = 0
-        self.gameCount = 0
-        self.childs = {}
+        self.PGN = PGN       # Nom du coup
+        self.whiteWon = 0    # Nombre de victoires blancs
+        self.blackWon = 0    # Nombre de victoires noirs
+        self.draw = 0        # Nombre d'égalité
+        self.gameCount = 0   # Nombre de parties
+        self.childs = {}   
 
     def getPGN(self):
         return self.PGN
