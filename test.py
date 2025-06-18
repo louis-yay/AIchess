@@ -1,24 +1,49 @@
 import os
 import matplotlib.pyplot as plt
+from Node import Node
 from constructor import constructNGRam
 
-DIR = "data"
-data = []
 
-# NUMBER OF GAME
-for file in sorted(os.listdir(DIR)):
+
+# The test here is to build 2 type of NGram,
+# One base on the classic database and another on a specific
+# The specific database class the games by oppening
+# This study show that the custrom database is useful
+# Only when we read 1 game of each file, and the corresponding
+# Amount is the default database.
+# For every bigger amount, the basic database show better result.
+
+
+def size(tree):
+    if tree.getChilds() != {}:
+        return 1 + sum([size(tree.getChilds()[elt]) for elt in tree.getChilds().keys()])
+    return 1
+
+
+def tester(DIR, nbOfGame = 10, nbOfFile = 5, N=1):
+    data = []
+    index = 0
+    """
+    Here we take 10 games of every oppening file
+    """
+    for file in sorted(os.listdir(DIR)):
+        if nbOfFile < 0:
+            break
         with open(DIR + "/" + file, "r", errors='ignore') as file:
+
+            # Read only the gameplay part
             reader = file.read().split("\n\n")
-            for i in range(1, len(reader), 2):
+            for i in range(1, nbOfGame*2, 2):
                 data.append(reader[i])
+                break
         del reader
+        index = 0
+        nbOfFile-=1
 
+    # On remplace les retour à la ligne par des espaces
+    # Split pour récupérer les coups un à un
 
-print(f"{len(data)} games on {len(os.listdir(DIR))} files with an average of {len(data)/len(os.listdir(DIR))}")
-
-
-# AVERAGE MOVE PER GAME
-for i in range(len(data)):
+    for i in range(len(data)):
         # print(f'Extraction des coups: {round(i/len(data)*100)}%')
         
         data[i] = data[i].replace("\n", " ")
@@ -27,68 +52,77 @@ for i in range(len(data)):
         data[i] = data[i].split(" ")
         while "" in data[i]:
             data[i].remove("")
+        
 
-total = 0
-for game in data:
-    for move in game:
-         total += 1
+    final = [ [] for i in range(len(data))]
 
-print(f"{total/len(data)} moves in average")
-del data
+    # Formatage d'un coup en retirant le numéro de manche
+    for i in range(len(data)):
+        for j in range(len(data[i])-1):
+            move = data[i][j].split(".")
+
+            try:
+                move = move[1]
+            except IndexError:
+                move = move[0]
+
+            if(len(move) > 2 and (not ('=' in move)) and move[0] != 'O'):   
+                if(move[-3] in ['R', 'N', 'B', 'Q', 'K']):  # figures
+                    move = move[-3:]
+                else:                                       # Pawn
+                    move = move[-2:]
+            elif(len(move) > 2 and '=' in move and move[0] != 'O'):
+                move = move[-4:]
+
+            final[i].append(move)
+        final[i].append(data[i][-1])
+
+    del data
+
+    output = Node(PGN=None)
+    return _build(final, N)
 
 
-# TREE SIZE
 
-def size(tree):
-    if tree.getChilds() != {}:
-        return 1 + sum([size(tree.getChilds()[elt]) for elt in tree.getChilds().keys()])
-    return 1
 
-print("1")
-size1 = {}
-for i in range(1000, 20001, 1000):
-     print(i)
-     size1[i] = size(constructNGRam("data", max=i, N=1))  
+def _build(dataSet, N):
+    output = Node(PGN = None)
+    for game in dataSet:
+        for moveIndex in range(len(game)-N):   
+            pNode = output     # For every move in every game
+            for pgnIndex in range(moveIndex, moveIndex+N):
+                try:
+                    pNode = pNode.getChilds()[game[pgnIndex]]
+                except KeyError:
+                    pNode = pNode.addChilds(game[pgnIndex], Node(game[pgnIndex+1]))
 
-print("2")
-size2 = {}
-for i in range(1000, 20001, 1000):
-     print(i)
-     size2[i] = size(constructNGRam("data", max=i, N=2))  
+                # Update winning rate
+                match game[-1]:
+                    case "1-0":
+                        pNode.updateWin("white")
+                    case "0-1":
+                        pNode.updateWin("black")
+                    case "1/2-1/2":
+                        pNode.updateWin("draw")  
 
-print("3")
-size3 = {}
-for i in range(1000, 20001, 1000):
-     print(i)
-     size3[i] = size(constructNGRam("data", max=i, N=3))  
 
-print("4")
-size4 = {}
-for i in range(1000, 20001, 1000):
-     print(i)
-     size4[i] = size(constructNGRam("data", max=i, N=4))  
+    return output
 
-print("5")
-size5 = {}
-for i in range(1000, 20001, 1000):
-     print(i)
-     size5[i] = size(constructNGRam("data", max=i, N=5))  
 
-print("6")
-size6 = {}
-for i in range(1000, 20001, 1000):
-     print(i)
-     size6[i] = size(constructNGRam("data", max=i, N=6))  
+sizeTest = {}
+sizeNormal = {}
 
-plt.plot(size1.keys(), size1.values(), label="N=1")
-plt.plot(size2.keys(), size2.values(), label="N=2")
-plt.plot(size3.keys(), size3.values(), label="N=3")
-plt.plot(size4.keys(), size4.values(), label="N=4")
-plt.plot(size5.keys(), size5.values(), label="N=5")
-plt.plot(size6.keys(), size6.values(), label="N=6")
+for i in range(25, 245, 25):    # the range of file
+    game = 15    # The nb of game to study in each file
+    sizeTest[i] = size(tester(DIR="openning", nbOfGame=game, nbOfFile=i, N=8))
 
-plt.xlabel("Nombre de partie")
-plt.ylabel("Taille du N-Gram")
+    # We study the equivalent amount of game in the default "data" dataset
+    sizeNormal[i] = size(constructNGRam(DIR="data", max=game*i, N=8))
+
+plt.plot(sizeNormal.keys(), sizeNormal.values(), label="Normal dataset")
+plt.plot(sizeTest.keys(), sizeTest.values(), label="Custom dataset")
 plt.legend()
+plt.xlabel("Number of game")
+plt.ylabel("Size of the 1-Gram")
 
 plt.show()
