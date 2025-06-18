@@ -188,8 +188,6 @@ class Board:
 
 
     def isLegalMove(self, move):
-        # TODO ADD promotion system
-
         """
         Take 2 chess position and check if the move is legal or not.
         """
@@ -235,7 +233,6 @@ class Board:
             return False
 
         # Piece are going to empty or enemie piece (except king)
-        # TODO finish the rules of the game
         match originPiece:
             case '00':
                 return False

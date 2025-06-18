@@ -25,9 +25,7 @@ class testNodeClass(unittest.TestCase):
     def test_legalMove(self):
         board = Board()
         board.setTestGrid()
-
-        # TODO verifier si la prise en passant est en tounois et l'ajouter si oui 
-
+        
         # Pawn
         self.assertTrue(board.isLegalMove("c2", "c3")) # Walk one
         self.assertTrue(board.isLegalMove("c2", "c4")) # Walk 2 from start

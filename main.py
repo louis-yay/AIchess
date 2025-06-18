@@ -11,15 +11,15 @@ import time
 
 # Game init
 board = Board()
-start = time.time()
-gram = constructNGRam("data", max=5000, N=5)
-end = time.time()
-
-print(f"Elapsed time: {end - start}s")
-
+# start = time.time()
+gram = constructNGRam("data", max=50000, N=7)
+# end = time.time()
+# 
+# print(f"Elapsed time: {end - start}s")
 
 # save(gram, "models/gram.pkl")
-# gram = load("models/gram.pkl")
+
+gram = load("models/gram.pkl")
         
 # user play the white
 gamelog = []
