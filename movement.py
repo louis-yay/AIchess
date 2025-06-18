@@ -1,5 +1,9 @@
 class Movement:
-
+    """
+    Define chess board movement
+    PosA -> Pos2
+        Example: Re2 -> Re7
+    """
     def __init__(self, piece = '', origin='', dest='', promotion=None):
         self.piece = piece
         self.origin = origin

@@ -1,5 +1,7 @@
 class Node:
-
+    """
+    Define node object for the tree construction
+    """
     BLACK = True
     WHITE = False
 
@@ -26,6 +28,9 @@ class Node:
         return self.childs[PGN]
     
     def updateWin(self, status):
+        """
+        Update winning status
+        """
         if(status == "white"):
           self.whiteWon += 1
         elif(status == "black"):
@@ -35,6 +40,9 @@ class Node:
         self.gameCount += 1   
 
     def ratio(self, player=WHITE):
+       """
+       Get winning ratio of the current player
+       """
        if player == self.WHITE:
           return self.whiteWon/self.gameCount
        else:
