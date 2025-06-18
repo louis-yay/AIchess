@@ -1,5 +1,4 @@
 import os
-from Move import Move
 from saving import load, save
 from chessgame import Board
 from Node import Node

@@ -48,6 +48,7 @@ def next():
 
 while running:
     # TODO Check winning conditions
+    # TODO CORRECT LOG SYSTEM
     board.display()
     # User play
     print("\n\n###########################")
@@ -75,8 +76,6 @@ while running:
     print(f"Computer played: {move.origin} -> {move.dest}")
     board.play(move)
     board.display()
-
-    gamelog.append(PGN)
 
     print("\n\n###########################")
     print(f"Current log: [[[ {gamelog} ]]]")

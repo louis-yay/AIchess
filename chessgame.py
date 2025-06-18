@@ -22,7 +22,7 @@ class Board:
         # W -> White & B -> Black
         # R -> Rook & N -> Knight & B -> Bishop & K -> King & Q -> Queen
         self.grid = [
-            # a     b    c       d     e     f     g     h   y/x
+            # h     g     f      e    d     c     b     a   y/x
             ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
@@ -86,7 +86,7 @@ class Board:
         if(len(square) == 2):
             if(square[0] >= 'a' and square[0] <= 'h' and square[1] >= '1' and square[1] <= '8'):
                 x = int(square[1]) -1
-                y = (ord(square[0]) - ord('a'))
+                y = 7 - (ord(square[0]) - ord('a'))
                 return Position(x,y)
         return None
 
@@ -148,7 +148,7 @@ class Board:
 
         index = 1
         print("########################")
-        print("a b c d e f g h")
+        print("h g f e d c b a")
         for line in self.grid:
 
             for piece in line:

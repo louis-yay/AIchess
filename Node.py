@@ -48,11 +48,12 @@ class Node:
        else:
           return self.blackWon/self.gameCount
     
-    def getNextMove(self, history: list):
+    def getNextMove(self, gamelog: list):
         """
         Take a list of move and return a move that matches the most
         the move history
         """
+        history = gamelog.copy()
         if(len(history) == 0):
             exit("INVALID HISTORY")
 
