@@ -14,6 +14,13 @@ from constructor import constructNGRam
 # For every bigger amount, the basic database show better result.
 
 
+# Partie 1
+['aa', 'ab', 'ac']
+
+# Partie 2
+['aa', 'ba', 'bc']
+
+
 def size(tree):
     if tree.getChilds() != {}:
         return 1 + sum([size(tree.getChilds()[elt]) for elt in tree.getChilds().keys()])
@@ -126,3 +133,9 @@ plt.xlabel("Number of game")
 plt.ylabel("Size of the 1-Gram")
 
 plt.show()
+
+
+{
+    "coupA": ['reponse1', 'reponse2', 'reponse3'],
+    "coupB": ['reponse1', 'reponse3', 'reponse4']
+}
