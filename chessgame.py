@@ -416,7 +416,6 @@ class Board:
         the switch paramater define the player playing, fakse for white, true for black
         We parcour all the piece that match the targeted type, and we check if the move is legal, the first piece with a legal move is moved.
         """
-
         # Piece analysis
         piece = ["W", "B"][switch]
         output = Movement()
@@ -431,12 +430,36 @@ class Board:
         else:
             piece += "P"
 
+        ### PRECISION SI 2 PIECE PEUVENT FINIR AU MEME ENDROIT.
+        #  la pièce vient de la colonne désigné par la lette
+        if((PGN[0] >= 'a' and PGN[0] <= 'h') and ((PGN[1] >= 'a' and PGN[1] <= 'h') or PGN[1] == 'x')):
+            for i in range(1,9):
+                if self.getPiece(self.convertPosition(f"{PGN[0]}{i}")) == piece:
+                    output.origin = f"{PGN[0]}{i}"
+                    PGN = PGN[1:]
+                    break
+
+        # La pièce vient de la ligne désigné par le chiffre
+        elif((PGN[0] >= '1' and PGN[0] <= '8')) and (PGN[1] == 'x' or (PGN[1] >= 'a' and PGN[1] <= 'h')):
+            for i in range(1,9):
+                if self.getPiece(self.convertPosition(f"{chr(ord('h') - i)}{PGN[0]}")) == piece:
+                    output.origin = f"{chr(ord('a') + i)}{PGN[0]}"
+                    PGN = PGN[1:]
+                    break
+
+        # La pièce vient de la case désigné par la lettre et le chiffre  
+        elif((PGN[0] >= 'a' and PGN[0] <= 'h') and (PGN[1] >= '1' and PGN[1] <= '8') and len(PGN) > 2 and ((PGN[2] >= 'a' and PGN[2] <= 'h') or PGN[1] == 'x')):
+                output.origin = f"{PGN[0]}{PGN[1]}"
+                PGN = PGN[2:]
+
+        # Analyse des coordonées du déplacement
+
         output.piece = piece
         for i in range(8):
             for j in range(8):
                 if(self.grid[i][j] == piece):
-                    if self.isLegalMove(Movement(origin=f"{chr(ord('a') + j)}{i + 1}", dest=f"{PGN[0]}{PGN[1]}")):
-                        output.origin = f"{chr(ord('a') + j)}{i + 1}"
+                    if self.isLegalMove(Movement(origin=f"{chr(ord('h') - j)}{i + 1}", dest=f"{PGN[0]}{PGN[1]}")):
+                        output.origin = f"{chr(ord('h') - j)}{i + 1}"
 
         output.dest = f"{PGN[0]}{PGN[1]}"
         PGN = PGN[2:]

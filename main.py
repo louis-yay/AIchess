@@ -10,7 +10,9 @@ import time
 
 # Game init
 board = Board()
+DEPTH = 7
 
+# gram = constructNGRam("data", 5000, 3)
 
 # Loading N-Gram from file, 50000 game, depth of 7.
 gram = load("models/gram.pkl")
@@ -21,13 +23,14 @@ insideTree = True
 running = True
 
 
-def next():
+def next(log, depth):
     """
     Return the next move to be played by the computer
     """
     out = None
     max = -1
-    PGN = gram.getNextMove(gamelog)        # List of move in the N-Gram
+    PGN = gram.getNextMove(gamelog[::-depth])        # List of move in the N-Gram
+    print(PGN)
     for pgn in PGN:
         move = board.convertPgn(pgn, Board.BLACK)
 
@@ -37,18 +40,23 @@ def next():
             max = gram.getChilds()[pgn].ratio(Node.BLACK)
 
     if out == None:
-        print("Computer Resign")
-        exit()
+        if len(log) > 1:
+            return next(log, depth-1)
+        else:
+            print("Computer Resign")
+            exit()
+
     gamelog.append(out[1])
-    
     return out[0]
             
 
 
 
 while running:
+    print(f"GRAM: {gram.PGN}")
     # TODO Check winning conditions
     # TODO CORRECT LOG SYSTEM
+    # FIXME Fix the movement system
     board.display()
     # User play
     print("\n\n###########################")
@@ -71,7 +79,7 @@ while running:
     print(gamelog)
     
     # Get next computer move
-    move = next()
+    move = next(gamelog, DEPTH)
 
     print(f"Computer played: {move.origin} -> {move.dest}")
     board.play(move)

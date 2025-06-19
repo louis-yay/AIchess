@@ -1,3 +1,5 @@
+import copy
+
 class Node:
     """
     Define node object for the tree construction
@@ -57,7 +59,7 @@ class Node:
         if(len(history) == 0):
             exit("INVALID HISTORY")
 
-        pNode = self    # Pointer to current node location
+        pNode = copy.copy(self)    # Pointer to current node location
         while len(history) != 0:
             current = history.pop(0)
             if current in pNode.childs:
