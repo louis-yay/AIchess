@@ -1,7 +1,7 @@
 import os
 import matplotlib.pyplot as plt
-from Node import Node
-from constructor import constructNGRam
+from NGram.Node import Node
+from NGram.constructor import constructNGRam
 
 
 

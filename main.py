@@ -1,8 +1,8 @@
 from chessgame import Board
 import random
-from constructor import constructNGRam
+from NGram.constructor import constructNGRam
 import time
-from Node import Node
+from NGram.Node import Node
 from saving import save, load
 import time
 
