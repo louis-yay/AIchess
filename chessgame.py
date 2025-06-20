@@ -27,11 +27,11 @@ class Board:
             ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
-            ['00', '00', '00', 'BK', '00', '00', '00', '00'], # 4
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
             ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'], # 7
-            ['BR', 'BN', 'BB', '00', 'BQ', 'BB', 'BN', 'BR']  # 8
+            ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
 
         self.currentPlayer = self.WHITE
@@ -54,6 +54,58 @@ class Board:
             ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', '00', 'BP'], # 7
             ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
+
+    def resetEmpty(self):
+        """
+        Reset grid to empty board.
+        """
+        self.grid = [
+            # a     b    c       d     e     f     g     h   y/x
+            ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 1
+            ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 2
+            ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 3
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
+            ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 7
+            ['00', '00', '00', '00', '00', '00', 'BP', '00']  # 8
+        ]
+
+    def makeVector(self):
+        """
+        Make a vector in the following form:
+        [
+            WPe1,
+            WPe2,
+            ...
+            Wph7,
+            WRe1,
+            ...
+            WRh8,
+            ... 
+        ]
+        With boolean indication if the piece is, or not, in the speficied case
+        Here is the order of the pieces:
+        00, WP, WPG, WR, WN, WB, WQ, WK, BP, BPG, BR, BN, BB, BQ, BK
+        """
+        vector = []
+        pieces = ['00', 'WP', 'WPG', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP','BPG', 'BR', 'BN', 'BB', 'BQ', 'BK']
+        for n in range(len(pieces)):
+            for i in range(8):
+                for j in range(8):
+                    if self.grid[i][j] == pieces[n]:
+                        vector.append(True)
+                    else:
+                        vector.append(False)
+        return vector
+
+    def setGridFromVector(self, vector):
+        pieces = ['00', 'WP', 'WPG', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP','BPG', 'BR', 'BN', 'BB', 'BQ', 'BK']
+        for n in range(len(pieces)):
+            for i in range(8):
+                for j in range(8):
+                        if vector[n*(8*8) + (i*8+j)]:
+                            self.grid[i][j] = pieces[n]
 
     def nextTurn(self):
         self.currentPlayer = not self.currentPlayer
