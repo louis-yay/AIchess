@@ -32,7 +32,7 @@ def next(log, depth):
     PGN = gram.getNextMove(gamelog[::-depth])        # List of move in the N-Gram
     print(PGN)
     for pgn in PGN:
-        move = board.convertPgn(pgn, Board.BLACK)
+        move = board.convertPgn(pgn)
 
         # We only consider move legal and found at least 10 times in the dataset
         if board.isLegalMove(move) and gram.getChilds()[pgn].ratio(Node.BLACK) > max and gram.getChilds()[pgn].gameCount > 10:
@@ -53,26 +53,24 @@ def next(log, depth):
 
 
 while running:
-    print(f"GRAM: {gram.PGN}")
     # TODO Check winning conditions
-    # TODO CORRECT LOG SYSTEM
-    # FIXME Fix the movement system
     board.display()
     # User play
     print("\n\n###########################")
     PGN = input("user: >>> ")   
-    move = board.convertPgn(PGN, board.WHITE)
+    move = board.convertPgn(PGN)
 
     # Warn the player if move is illegal
     while not board.isLegalMove(move):
         print("INVALID MOVE")
         PGN = input("user: >>> ")
-        move = board.convertPgn(PGN, board.WHITE)
+        move = board.convertPgn(PGN,)
 
 
     print(f"User player {move.origin} -> {move.dest}")
     board.play(move)
     board.display()
+    board.nextTurn()
 
     # log the game
     gamelog.append(PGN)
@@ -84,6 +82,7 @@ while running:
     print(f"Computer played: {move.origin} -> {move.dest}")
     board.play(move)
     board.display()
+    board.nextTurn()
 
     print("\n\n###########################")
     print(f"Current log: [[[ {gamelog} ]]]")

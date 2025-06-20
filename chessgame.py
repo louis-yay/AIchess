@@ -8,7 +8,7 @@ from random import choice
 class Board:
     """
     This class define the chess board and the game.
-    It define the rules, the game state and allow convertion between PGN and 
+    It define the rules, the game state and allow convertion between PGN and
     Coordonate movement (PosA -> PosB)
         Exemple: e2 -> e4
     """
@@ -33,6 +33,8 @@ class Board:
             ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
 
+        self.currentPlayer = self.WHITE
+
     def getGrid(self):
         return self.grid
     
@@ -51,6 +53,9 @@ class Board:
             ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', '00', 'BP'], # 7
             ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
+
+    def nextTurn(self):
+        self.currentPlayer = not self.currentPlayer
         
     def isBlack(self, piece):
         """
@@ -68,12 +73,12 @@ class Board:
             return False
         else: return piece[0] == "W"
 
-    def isEnemy(self, piece, switch=WHITE):
+    def isEnemy(self, piece):
         """
         Given a color (switch) describing the team of the player, and a piece
         Tell if the piece is enemie of the player
         """
-        return [self.isBlack(piece), self.isWhite(piece)][switch]
+        return [self.isBlack(piece), self.isWhite(piece)][self.currentPlayer]
 
     def convertPosition(self, square):
         """
@@ -307,24 +312,24 @@ class Board:
                 else:
                     return self.checkOnMove(origin, dest, linear=False) and self.checkDiagonal(origin, dest)
                 
-            case 'WK' | 'BK':       # King
+            case 'WK' | 'BK':        # King
+                  
                   return floor(origin.distance(dest)) == 1
         return False
-    
 
-    def isCheck(self, color=WHITE):
+    def isCheck(self):
         """
         Check if the current color King is in a check situation.
         """
         return False
 
-    def getLegalMoves(self, color):
+    def getLegalMoves(self):
         """
         Return a liste of legal move the current player can use
         color take a color constant, WHITE, BLACK
         """
         moves =[]
-        color = ['W', 'B'][color]
+        color = ['W', 'B'][self.currentPlayer]
 
         # Find all the player pieces
         for i in range(8):
@@ -410,14 +415,14 @@ class Board:
             return True
         return False
 
-    def convertPgn(self, PGN, switch=WHITE):
+    def convertPgn(self, PGN):
         """
         Convert PGN formated move into classical chess move used in the rest of the program
         the switch paramater define the player playing, fakse for white, true for black
         We parcour all the piece that match the targeted type, and we check if the move is legal, the first piece with a legal move is moved.
         """
         # Piece analysis
-        piece = ["W", "B"][switch]
+        piece = ["W", "B"][self.currentPlayer]
         output = Movement()
 
         if PGN == "O-O" or PGN == 'O-O-O': # Small rock & big rock
