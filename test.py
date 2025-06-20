@@ -13,14 +13,6 @@ from constructor import constructNGRam
 # Amount is the default database.
 # For every bigger amount, the basic database show better result.
 
-
-# Partie 1
-['aa', 'ab', 'ac']
-
-# Partie 2
-['aa', 'ba', 'bc']
-
-
 def size(tree):
     if tree.getChilds() != {}:
         return 1 + sum([size(tree.getChilds()[elt]) for elt in tree.getChilds().keys()])

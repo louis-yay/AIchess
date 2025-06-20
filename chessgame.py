@@ -2,6 +2,7 @@ from math import sqrt, floor
 from position import Position
 from movement import Movement
 from random import choice
+import copy
 
 
 
@@ -26,11 +27,11 @@ class Board:
             ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
-            ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
+            ['00', '00', '00', 'BK', '00', '00', '00', '00'], # 4
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
             ['BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP', 'BP'], # 7
-            ['BR', 'BN', 'BB', 'BK', 'BQ', 'BB', 'BN', 'BR']  # 8
+            ['BR', 'BN', 'BB', '00', 'BQ', 'BB', 'BN', 'BR']  # 8
         ]
 
         self.currentPlayer = self.WHITE
@@ -218,7 +219,38 @@ class Board:
         And tell, with the current board, if the move is legal or not
         Does not take in count check state
         """
-        # ROCK
+        # Covert to cartesian coordonate (0,0)
+        origin = self.convertPosition(move.origin)
+        dest = self.convertPosition(move.dest)
+
+        # Get the piece from the grid
+        originPiece = self.getPiece(origin)
+        destPiece = self.getPiece(dest)
+
+        # Check coordonates are in the board limits
+        if (origin == None or dest == None):
+            return False
+        
+        # Check if the piece go to a piece of the same color or to a King
+        if(originPiece[0] == destPiece[0]):
+            return False
+
+        # Check if promotion item is legal
+        if not move.promotion in ['R', 'N', 'B', 'Q', None]:
+            return False
+
+        # Check of check
+        tmpGrid = copy.deepcopy(self.grid)
+        if ['W', 'B'][self.currentPlayer] == originPiece[0]:    # get player's team
+            self.movePiece(move.origin, move.dest)              # Simulate movement
+
+            if self.isCheck(): 
+                self.grid = copy.deepcopy(tmpGrid)
+                return False
+            self.grid = copy.deepcopy(tmpGrid)
+
+
+        # Rock
         if(move.origin[1:]  == "O-O" or move.origin[1:] == "O-O-O"):
             if move.origin[0] == 'W':
                 line = 1
@@ -237,27 +269,7 @@ class Board:
                     self.getPiece(self.convertPosition(f"b{line}")) == "00" and 
                     self.getPiece(self.convertPosition(f"a{line}")) == f"{move.origin[0]}R" and 
                     move.origin[1:] == 'O-O-O')
-                )
-
-        # Covert to cartesian coordonate (0,0)
-        origin = self.convertPosition(move.origin)
-        dest = self.convertPosition(move.dest)
-
-        # Get the piece from the grid
-        originPiece = self.getPiece(origin)
-        destPiece = self.getPiece(dest)
-
-        # Check coordonates are in the board limits
-        if (origin == None or dest == None):
-            return False
-        
-        # Check if the piece go to a piece of the same color or to a King
-        if(originPiece[0] == destPiece[0] or destPiece[1] == 'K'):
-            return False
-
-        # Check if promotion item is legal
-        if not move.promotion in ['R', 'N', 'B', 'Q', None]:
-            return False
+                )    
 
         # Piece are going to empty or enemie piece (except king)
         match originPiece:
@@ -313,14 +325,32 @@ class Board:
                     return self.checkOnMove(origin, dest, linear=False) and self.checkDiagonal(origin, dest)
                 
             case 'WK' | 'BK':        # King
-                  
-                  return floor(origin.distance(dest)) == 1
+                return floor(origin.distance(dest)) == 1
         return False
 
     def isCheck(self):
         """
         Check if the current color King is in a check situation.
         """
+        color = ['W', 'B'][self.currentPlayer]
+
+        # Find ally king
+        for x in range(8):
+            for y in range(8):
+                if(self.grid[x][y] == f"{color}K"):
+                    kingPos = f"{chr(ord('a') + y)}{x + 1}"
+                    break
+
+        # For every piece
+        for i in range(8):
+            for j in range(8):
+
+                # If the piece is an enemy
+                if(self.isEnemy(self.grid[i][j])):
+
+                    if(self.isLegalMove(Movement(origin=f"{chr(ord('a') + j)}{i + 1}", dest=kingPos))):
+                        return True
+
         return False
 
     def getLegalMoves(self):

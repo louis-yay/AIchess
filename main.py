@@ -12,10 +12,10 @@ import time
 board = Board()
 DEPTH = 7
 
-# gram = constructNGRam("data", 5000, 3)
+gram = constructNGRam("data", 5000, 3)
 
 # Loading N-Gram from file, 50000 game, depth of 7.
-gram = load("models/gram.pkl")
+# gram = load("models/gram.pkl")
         
 # user play the white
 gamelog = []
@@ -30,7 +30,6 @@ def next(log, depth):
     out = None
     max = -1
     PGN = gram.getNextMove(gamelog[::-depth])        # List of move in the N-Gram
-    print(PGN)
     for pgn in PGN:
         move = board.convertPgn(pgn)
 
@@ -64,7 +63,7 @@ while running:
     while not board.isLegalMove(move):
         print("INVALID MOVE")
         PGN = input("user: >>> ")
-        move = board.convertPgn(PGN,)
+        move = board.convertPgn(PGN)
 
 
     print(f"User player {move.origin} -> {move.dest}")
