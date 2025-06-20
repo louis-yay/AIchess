@@ -39,7 +39,7 @@ def next(log, depth):
             max = gram.getChilds()[pgn].ratio(Node.BLACK)
 
     if out == None:
-        if len(log) > 1:
+        if depth > 1:
             return next(log, depth-1)
         else:
             print("Computer Resign")

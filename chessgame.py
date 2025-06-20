@@ -92,7 +92,7 @@ class Board:
         if(len(square) == 2):
             if(square[0] >= 'a' and square[0] <= 'h' and square[1] >= '1' and square[1] <= '8'):
                 x = int(square[1]) -1
-                y = 7 - (ord(square[0]) - ord('a'))
+                y = (ord('h') - ord(square[0]))
                 return Position(x,y)
         return None
 
@@ -338,7 +338,7 @@ class Board:
         for x in range(8):
             for y in range(8):
                 if(self.grid[x][y] == f"{color}K"):
-                    kingPos = f"{chr(ord('a') + y)}{x + 1}"
+                    kingPos = f"{chr(ord('h') - y)}{x + 1}"
                     break
 
         # For every piece
@@ -348,7 +348,7 @@ class Board:
                 # If the piece is an enemy
                 if(self.isEnemy(self.grid[i][j])):
 
-                    if(self.isLegalMove(Movement(origin=f"{chr(ord('a') + j)}{i + 1}", dest=kingPos))):
+                    if(self.isLegalMove(Movement(origin=f"{chr(ord('h') - j)}{i + 1}", dest=kingPos))):
                         return True
 
         return False
@@ -369,8 +369,8 @@ class Board:
                     # Check for every square if the move is legal
                     for x in range(8):
                         for y in range(8):
-                            if(self.isLegalMove(Movement(f"{chr(ord('a') + j)}{i + 1}", f"{chr(ord('a') + y)}{x + 1}"))):
-                                moves.append(Movement(f"{chr(ord('a') + j)}{i + 1}", f"{chr(ord('a') + y)}{x + 1}", None))
+                            if(self.isLegalMove(Movement(f"{chr(ord('h') - j)}{i + 1}", f"{chr(ord('h') - y)}{x + 1}"))):
+                                moves.append(Movement(f"{chr(ord('h') - j)}{i + 1}", f"{chr(ord('h') - y)}{x + 1}", None))
                     
         return moves
     
@@ -478,7 +478,7 @@ class Board:
         elif((PGN[0] >= '1' and PGN[0] <= '8')) and (PGN[1] == 'x' or (PGN[1] >= 'a' and PGN[1] <= 'h')):
             for i in range(1,9):
                 if self.getPiece(self.convertPosition(f"{chr(ord('h') - i)}{PGN[0]}")) == piece:
-                    output.origin = f"{chr(ord('a') + i)}{PGN[0]}"
+                    output.origin = f"{chr(ord('h') - i)}{PGN[0]}"
                     PGN = PGN[1:]
                     break
 
