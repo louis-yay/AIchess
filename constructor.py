@@ -7,9 +7,9 @@ import time
 from saving import save
 
 # Maximal asbtraction version
-WHITEWIN = "1-0"
-BLACKWIN = "0-1"
-DRAW = "1/2-1/2"
+WHITEWIN = False
+BLACKWIN = True
+DRAW = None
 
 def constructGraph(DIR, max=1000):
     """
@@ -77,9 +77,9 @@ def _build(dataSet):
     noeud = 0
     board = Board()
     outDict = {
-        "1-0": Node("1-0"),
-        "0-1": Node("0-1"),
-        "1/2-1/2": Node("1/2-1/2")
+        "1-0": Node(WHITEWIN),
+        "0-1": Node(BLACKWIN),
+        "1/2-1/2": Node(DRAW)
     }
     outGraph = Node(tuple(board.makeVector()))
     outDict[tuple(board.makeVector())] = outGraph
@@ -113,22 +113,3 @@ def _build(dataSet):
 
     return (outGraph, outDict)
 
-
-
-def getDistance(graph, dic: dict, dest):
-    for key in dic:
-        dic[key] = [dic[key], inf, False]   # (Node, distance, visited)
-    dic[graph.board] = [dic[graph.board], 0, False]
-    return _parcours(graph, dic, dest)
-
-
-def _parcours(graph, dic, dest):
-    if graph.board == dest:
-        return 1 #dic[graph.board][1]
-    for childKey in graph.getChilds():
-        child = graph.getChilds()[childKey]
-        if(not dic[child.board][2]):    # this node as not been visited
-            dic[child.board][2] = True  # Set the node as visited
-            # dic[child.board][1] = dic[graph.board][1] + 1 # Update distance as current distance + 1 
-            return 1 + _parcours(child, dic, dest)
-    return 0

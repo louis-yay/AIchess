@@ -5,14 +5,15 @@ import time
 from Node import Node
 from saving import save, load
 import time
+from math import inf
 
 
 
 # Game init
 board = Board()
 
-# Loading N-Gram from file, 50000 game, depth of 7.
-# gram = load("models/gram.pkl")
+graph = load("models/2000GamesGraph.pkl")
+dic = load("models/2000GamesDict.pkl")
         
 # user play the white
 gamelog = []
@@ -21,14 +22,41 @@ running = True
 
 graph, index = constructGraph("data", max=50)
 
+def getDistance(graph, dic: dict, dest):
+    for key in dic:
+        dic[key] = [dic[key], inf, False]   # (Node, distance, visited)
+    dic[graph.board] = [dic[graph.board], 0, False]
+    return _parcours(graph, dic, dest)
+
+
+def _parcours(graph, dic, dest):
+    if graph.board == dest:
+        return 1 #dic[graph.board][1]
+    for childKey in graph.getChilds():
+        child = graph.getChilds()[childKey]
+        if(not dic[child.board][2]):    # this node as not been visited
+            dic[child.board][2] = True  # Set the node as visited
+            # dic[child.board][1] = dic[graph.board][1] + 1 # Update distance as current distance + 1 
+            return 1 + _parcours(child, dic, dest)
+    return 0
+
 def next():
-    print(len(index.keys()))
-    if(tuple(board.makeVector()) in list(index.keys())):
-        return list(index[tuple(board.makeVector())].getChilds().keys())[0]
-    else:
-        print("Computer resign.")
-        exit()
-            
+    
+    move = None
+    vector = tuple(board.makeVector())
+    if vector in dic:
+        current = dic[vector]   # Get the current board state node
+
+        # Sorted list of all current node's child by distance to current player's team
+        issues = sorted([(key, getDistance(current.getChilds()[key], dic, board.currentPlayer)) for key in list(current.getChilds().keys())], key=lambda tup:tup[1])
+        while issues != []:
+            if(board.isLegalMove(board.convertPgn(issues[0][0]))):
+                return issues[0][0]
+            issues.pop(0)
+
+    print("Computer resign.")
+    exit()
+
 
 
 
