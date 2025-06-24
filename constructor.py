@@ -85,8 +85,8 @@ def _build(dataSet):
                 ptGraph.addChild(game[i], outDict[game[i]])
             else:
                 if not board.isLegalMove(board.convertPgn(game[i])):
-                    # board.display()
-                    # print(board.isLegalMove(board.convertPgn(game[i])))
+                    board.display()
+                    print(board.isLegalMove(board.convertPgn(game[i])))
                     raise ValueError
                 board.play(board.convertPgn(game[i]))
                 # board.display()
@@ -102,6 +102,11 @@ def _build(dataSet):
                     outDict[vector] = ptGraph
     
     return (outGraph, outDict)
+
+
+graph, dic = constructGraph("data", 100)
+print(len(dic))
+
 
 # # TODO the algo
 # # TODO: faire des tests sur des cas particulier (linéaire, boucle, etc...)
