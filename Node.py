@@ -9,7 +9,13 @@ class Node:
 
     def __init__(self, board):
         self.board = board       # Nom du coup
-        self.childs = []
+        self.childs = {}        # move -> new board
+
+        # Used for the graph visit
+        # TODO: TRY sans memoisation
+        self.distance = 0
+        self.visited = False
+        
 
     def getBoard(self):
         return self.board
@@ -17,16 +23,14 @@ class Node:
     def getChilds(self):
         return self.childs
 
-    def addChild(self, board):
+    def addChild(self, pgn, node):
         """
         Don't update the winning condition.
         """
-        for child in self.childs:
-            if child.board == board:
-                return child
+        if pgn in list(self.childs.keys()):
+            return self.childs[pgn]
 
-        node = Node(board)
-        self.childs.append(node)
+        self.childs[pgn] = node
         return node
                
 

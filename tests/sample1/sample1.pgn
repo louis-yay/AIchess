@@ -1,0 +1,14 @@
+[Event "Faux event"]
+[Site "internet"]
+[Date "oui"]
+[Round "1.5"]
+[White "Bob"]
+[Black "Alice"]
+[Result "1-0"]
+[WhiteElo "2024"]
+[BlackElo "2212"]
+[ECO "B28"]
+[C'est une game pour un graph lineaire]
+
+1.a4 a5 2.b4 b5 3.b5 b4 4.Ra3 Ra6 5.Nf3 Nf6 6.g3 g6 7.Bh3 Bh6 8.Kf1 Kf8 9.Qe1 Qe8 1-0
+

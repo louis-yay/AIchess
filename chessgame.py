@@ -24,7 +24,7 @@ class Board:
         # R -> Rook & N -> Knight & B -> Bishop & K -> King & Q -> Queen
         self.grid = [
             # h     g     f      e    d     c     b     a   y/x
-            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR'], # 1
+            ['WR', 'WN', 'WB', 'WK', 'WQ', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
@@ -45,7 +45,7 @@ class Board:
         """
         self.grid = [
             # a     b    c       d     e     f     g     h   y/x
-            ['WR', 'WN', 'WB', 'WQ', 'WK', 'WB', 'WN', 'WR'], # 1
+            ['WR', 'WN', 'WB', 'WK', 'WQ', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
@@ -88,6 +88,8 @@ class Board:
         Here is the order of the pieces:
         00, WP, WPG, WR, WN, WB, WQ, WK, BP, BPG, BR, BN, BB, BQ, BK
         """
+        #TODO: ne pas embarquer l'historique (pion fantome)
+        # Case vide déterminable après coup
         vector = []
         pieces = ['00', 'WP', 'WPG', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP','BPG', 'BR', 'BN', 'BB', 'BQ', 'BK']
         for n in range(len(pieces)):
@@ -242,6 +244,9 @@ class Board:
         current = Position(pos1.x, pos1.y)
         dist = pos1.distance(pos2)
 
+        if linear and (pos1.x != pos2.x and pos1.y != pos2.y):
+            return False
+
         while dist > 0:
             nbMove = (not linear) + 1 # check if you can move diagonally
             if(current.x != pos2.x and nbMove > 0):
@@ -271,6 +276,27 @@ class Board:
         And tell, with the current board, if the move is legal or not
         Does not take in count check state
         """
+        # Rock
+        if(move.origin[1:]  == "O-O" or move.origin[1:] == "O-O-O"):
+            if move.origin[0] == 'W':
+                line = 1
+            else:
+                line = 8
+            return ((
+                    self.getPiece(self.convertPosition(f"e{line}")) == f"{move.origin[0]}K" and
+                    self.getPiece(self.convertPosition(f"f{line}")) == "00" and
+                    self.getPiece(self.convertPosition(f"g{line}")) == "00" and
+                    self.getPiece(self.convertPosition(f"h{line}")) == f"{move.origin[0]}R" and 
+                    move.origin[1:] == 'O-O')
+                or 
+                    (self.getPiece(self.convertPosition(f"e{line}")) == f"{move.origin[0]}K" and
+                    self.getPiece(self.convertPosition(f"d{line}")) == "00" and
+                    self.getPiece(self.convertPosition(f"c{line}")) == "00" and
+                    self.getPiece(self.convertPosition(f"b{line}")) == "00" and 
+                    self.getPiece(self.convertPosition(f"a{line}")) == f"{move.origin[0]}R" and 
+                    move.origin[1:] == 'O-O-O')
+                ) 
+
         # Covert to cartesian coordonate (0,0)
         origin = self.convertPosition(move.origin)
         dest = self.convertPosition(move.dest)
@@ -302,26 +328,7 @@ class Board:
             self.grid = copy.deepcopy(tmpGrid)
 
 
-        # Rock
-        if(move.origin[1:]  == "O-O" or move.origin[1:] == "O-O-O"):
-            if move.origin[0] == 'W':
-                line = 1
-            else:
-                line = 8
-            return ((
-                    self.getPiece(self.convertPosition(f"e{line}")) == f"{move.origin[0]}K" and
-                    self.getPiece(self.convertPosition(f"f{line}")) == "00" and
-                    self.getPiece(self.convertPosition(f"g{line}")) == "00" and
-                    self.getPiece(self.convertPosition(f"h{line}")) == f"{move.origin[0]}R" and 
-                    move.origin[1:] == 'O-O')
-                or 
-                    (self.getPiece(self.convertPosition(f"e{line}")) == f"{move.origin[0]}K" and
-                    self.getPiece(self.convertPosition(f"d{line}")) == "00" and
-                    self.getPiece(self.convertPosition(f"c{line}")) == "00" and
-                    self.getPiece(self.convertPosition(f"b{line}")) == "00" and 
-                    self.getPiece(self.convertPosition(f"a{line}")) == f"{move.origin[0]}R" and 
-                    move.origin[1:] == 'O-O-O')
-                )    
+           
 
         # Piece are going to empty or enemie piece (except king)
         match originPiece:
@@ -385,6 +392,7 @@ class Board:
         Check if the current color King is in a check situation.
         """
         color = ['W', 'B'][self.currentPlayer]
+        kingPos = ""
 
         # Find ally king
         for x in range(8):
@@ -433,7 +441,7 @@ class Board:
         Rock is encoded: [color][small/big rock] in move.origin
         """
         if(self.isLegalMove(move)):
-
+            # TODO VERIFY CHECK DURING ROCK
             # Small Rock
             if(move.origin[1:] == "O-O"):   
                 if move.origin[0] == 'W':
@@ -517,11 +525,14 @@ class Board:
         else:
             piece += "P"
 
+        output.piece = piece
+
         ### PRECISION SI 2 PIECE PEUVENT FINIR AU MEME ENDROIT.
         #  la pièce vient de la colonne désigné par la lette
         if((PGN[0] >= 'a' and PGN[0] <= 'h') and ((PGN[1] >= 'a' and PGN[1] <= 'h') or PGN[1] == 'x')):
             for i in range(1,9):
-                if self.getPiece(self.convertPosition(f"{PGN[0]}{i}")) == piece:
+                if (self.getPiece(self.convertPosition(f"{PGN[0]}{i}")) == piece and
+                     self.isLegalMove(Movement(piece= piece, origin=f"{PGN[0]}{i}", dest=f"{PGN[-2]}{PGN[-1]}"))):
                     output.origin = f"{PGN[0]}{i}"
                     PGN = PGN[1:]
                     break
@@ -529,24 +540,26 @@ class Board:
         # La pièce vient de la ligne désigné par le chiffre
         elif((PGN[0] >= '1' and PGN[0] <= '8')) and (PGN[1] == 'x' or (PGN[1] >= 'a' and PGN[1] <= 'h')):
             for i in range(1,9):
-                if self.getPiece(self.convertPosition(f"{chr(ord('h') - i)}{PGN[0]}")) == piece:
-                    output.origin = f"{chr(ord('h') - i)}{PGN[0]}"
+                if (self.getPiece(self.convertPosition(f"{chr(ord('h') - (i-1))}{PGN[0]}")) == piece and
+                        self.isLegalMove(Movement(piece=piece, origin=f"{chr(ord('h') - (i-1))}{PGN[0]}", dest=f"{PGN[-2]}{PGN[-1]}"))
+                        ):
+                    output.origin = f"{chr(ord('h') - (i-1))}{PGN[0]}"
                     PGN = PGN[1:]
                     break
 
         # La pièce vient de la case désigné par la lettre et le chiffre  
-        elif((PGN[0] >= 'a' and PGN[0] <= 'h') and (PGN[1] >= '1' and PGN[1] <= '8') and len(PGN) > 2 and ((PGN[2] >= 'a' and PGN[2] <= 'h') or PGN[1] == 'x')):
+        elif((PGN[0] >= 'a' and PGN[0] <= 'h') and (PGN[1] >= '1' and PGN[1] <= '8') and len(PGN) > 2 and ((PGN[2] >= 'a' and PGN[2] <= 'h') or PGN[1] == 'x') and
+             self.isLegalMove(Movement(piece=piece, origin=f"{PGN[0]}{PGN[1]}", dest=f"{PGN[-2]}{PGN[-1]}"))):
                 output.origin = f"{PGN[0]}{PGN[1]}"
                 PGN = PGN[2:]
 
         # Analyse des coordonées du déplacement
-
-        output.piece = piece
-        for i in range(8):
-            for j in range(8):
-                if(self.grid[i][j] == piece):
-                    if self.isLegalMove(Movement(origin=f"{chr(ord('h') - j)}{i + 1}", dest=f"{PGN[0]}{PGN[1]}")):
-                        output.origin = f"{chr(ord('h') - j)}{i + 1}"
+        else:
+            for i in range(8):
+                for j in range(8):
+                    if(self.grid[i][j] == piece):
+                        if self.isLegalMove(Movement(piece=piece, origin=f"{chr(ord('h') - j)}{i + 1}", dest=f"{PGN[0]}{PGN[1]}")):
+                            output.origin = f"{chr(ord('h') - j)}{i + 1}"
 
         output.dest = f"{PGN[0]}{PGN[1]}"
         PGN = PGN[2:]

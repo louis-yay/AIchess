@@ -1,0 +1,14 @@
+[Event "Faux event"]
+[Site "internet"]
+[Date "oui"]
+[Round "1.5"]
+[White "Bob"]
+[Black "Alice"]
+[Result "1-0"]
+[WhiteElo "2024"]
+[BlackElo "2212"]
+[ECO "B28"]
+[C'est une game pour un graph qui boucle pas sur le début]
+
+1.e4 e5 2.f3 f6 3.Nc3 Nc6 4.Nb1 Nb8 5.Ke2 Bc5 0-1
+

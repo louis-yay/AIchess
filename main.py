@@ -1,8 +1,8 @@
 from chessgame import Board
 import random
-from NGram.constructor import constructNGRam
+from constructor import constructGraph
 import time
-from NGram.Node import Node
+from Node import Node
 from saving import save, load
 import time
 
@@ -10,43 +10,24 @@ import time
 
 # Game init
 board = Board()
-DEPTH = 7
-
-gram = constructNGRam("data", 5000, 3)
 
 # Loading N-Gram from file, 50000 game, depth of 7.
 # gram = load("models/gram.pkl")
         
 # user play the white
 gamelog = []
-insideTree = True
 running = True
 
 
-def next(log, depth):
-    """
-    Return the next move to be played by the computer
-    """
-    out = None
-    max = -1
-    PGN = gram.getNextMove(gamelog[::-depth])        # List of move in the N-Gram
-    for pgn in PGN:
-        move = board.convertPgn(pgn)
+graph, index = constructGraph("data", max=50)
 
-        # We only consider move legal and found at least 10 times in the dataset
-        if board.isLegalMove(move) and gram.getChilds()[pgn].ratio(Node.BLACK) > max and gram.getChilds()[pgn].gameCount > 10:
-            out = (move, pgn)
-            max = gram.getChilds()[pgn].ratio(Node.BLACK)
-
-    if out == None:
-        if depth > 1:
-            return next(log, depth-1)
-        else:
-            print("Computer Resign")
-            exit()
-
-    gamelog.append(out[1])
-    return out[0]
+def next():
+    print(len(index.keys()))
+    if(tuple(board.makeVector()) in list(index.keys())):
+        return list(index[tuple(board.makeVector())].getChilds().keys())[0]
+    else:
+        print("Computer resign.")
+        exit()
             
 
 
@@ -76,8 +57,8 @@ while running:
     print(gamelog)
     
     # Get next computer move
-    move = next(gamelog, DEPTH)
-
+    PGN = next()
+    move = board.convertPgn(PGN)
     print(f"Computer played: {move.origin} -> {move.dest}")
     board.play(move)
     board.display()

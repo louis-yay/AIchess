@@ -2,10 +2,11 @@ import os
 from saving import load, save
 from chessgame import Board
 from Node import Node
+from math import inf
 
 # Maximal asbtraction version
 
-def constructNGRam(DIR, max=1000):
+def constructGraph(DIR, max=1000):
     """
     Return a dictionnarie of index for the graph nodes AND, the graph itselve
     """
@@ -52,13 +53,13 @@ def constructNGRam(DIR, max=1000):
                 move = move[0]
 
             # Remove abiguiti correction from PGN notation
-            if(len(move) > 2 and (not ('=' in move)) and move[0] != 'O'):   
-                if(move[-3] in ['R', 'N', 'B', 'Q', 'K']):  # for figures
-                    move = move[-3:]
-                else:                                       # for Pawns
-                    move = move[-2:]
-            elif(len(move) > 2 and '=' in move and move[0] != 'O'):
-                move = move[-4:]
+            # if(len(move) > 2 and (not ('=' in move)) and move[0] != 'O'):   
+            #     if(move[-3] in ['R', 'N', 'B', 'Q', 'K']):  # for figures
+            #         move = move[-3:]
+            #     else:                                       # for Pawns
+            #         move = move[-2:]
+            # elif(len(move) > 2 and '=' in move and move[0] != 'O'):
+            #     move = move[-4:]
 
             final[i].append(move)
         final[i].append(data[i][-1])
@@ -67,35 +68,58 @@ def constructNGRam(DIR, max=1000):
 
 def _build(dataSet):
     board = Board()
-    outDict = {}
+    outDict = {
+        "1-0": Node("WWIN"),
+        "0-1": Node("BWIN"),
+        "1/2-1/2": Node("DRAW")
+    }
     outGraph = Node(tuple(board.makeVector()))
-    ptGraph = outGraph      # Graph pointer
-    outDict[tuple(board.makeVector())] = []
+    outDict[tuple(board.makeVector())] = outGraph
 
     for game in dataSet:
         board.resetGrid()
-        ptGraph = outGraph
+        board.currentPlayer = Board.WHITE
+        ptGraph = outGraph  # graph pointer
         for i in range(len(game)):
-            board.play(board.convertPgn(game[i]))
-            vector = tuple(board.makeVector())
-            if vector in list(outDict.keys()):
+            if game[i] in ["0-1", "1-0", "1/2-1/2"]:
+                ptGraph.addChild(game[i], outDict[game[i]])
+            else:
+                if not board.isLegalMove(board.convertPgn(game[i])):
+                    # board.display()
+                    # print(board.isLegalMove(board.convertPgn(game[i])))
+                    raise ValueError
+                board.play(board.convertPgn(game[i]))
+                # board.display()
+                board.nextTurn()
+                vector = tuple(board.makeVector())
+                if vector in list(outDict.keys()):
 
-                # Make connexion between current and new
-                ptGraph = ptGraph.addChild(outDict[vector])
-            else:   
-                # Make connexion from current node to new node
-                ptGraph = ptGraph.addChild(vector)
+                    # Make connexion between current and new
+                    ptGraph = ptGraph.addChild(game[i], outDict[vector])
+                else:   
+                    # Make connexion from current node to new node
+                    ptGraph = ptGraph.addChild(game[i], Node(vector))
+                    outDict[vector] = ptGraph
     
     return (outGraph, outDict)
 
-
-b = Board()
-graph, dic = constructNGRam("data", 3)
-print(graph.childs)
-print("DEFAULT BOARD:")
-b.display()
-
-for child in graph.childs:
-    b.setGridFromVector(child.board)
-    print("CHILD FROM DEFAULT BOARD")
-    b.display()
+# # TODO the algo
+# # TODO: faire des tests sur des cas particulier (linéaire, boucle, etc...)
+# def getDistance(graph, dic: dict, dest = "WWIN"):
+#     for key in dic:
+#         dic[key].distance = inf
+#         dic[key].visited = False
+#     graph.distance = 0
+#     return _parcours(graph)
+# 
+# 
+# def _parcours(graph, dest = "WWIN"):
+#     print(type(graph.board))
+#     if graph.board == "WWIN" or graph.board == "BWIN" or graph.board == "DRAW":
+#         return graph.distance
+#     for childKey in graph.getChilds():
+#         graph.getChilds()[childKey].distance = graph.distance + 1
+#         _parcours(graph.getChilds()[childKey])
+# 
+# graph, dic = constructGraph("data", 10)
+# print(getDistance(graph, dic))
