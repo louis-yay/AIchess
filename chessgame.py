@@ -91,7 +91,7 @@ class Board:
         #TODO: ne pas embarquer l'historique (pion fantome)
         # Case vide déterminable après coup
         vector = []
-        pieces = ['00', 'WP', 'WPG', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP','BPG', 'BR', 'BN', 'BB', 'BQ', 'BK']
+        pieces = ['WP', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP', 'BR', 'BN', 'BB', 'BQ', 'BK']
         for n in range(len(pieces)):
             for i in range(8):
                 for j in range(8):
@@ -102,7 +102,8 @@ class Board:
         return vector
 
     def setGridFromVector(self, vector):
-        pieces = ['00', 'WP', 'WPG', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP','BPG', 'BR', 'BN', 'BB', 'BQ', 'BK']
+        pieces = ['WP', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP', 'BR', 'BN', 'BB', 'BQ', 'BK']
+        self.resetEmpty()
         for n in range(len(pieces)):
             for i in range(8):
                 for j in range(8):
@@ -263,7 +264,7 @@ class Board:
                     current.y -= 1
             
             # check if new position is empty
-            if (self.getPiece(current) != '00' and not current.equal(pos2)):
+            if ((self.getPiece(current) != '00' and not self.getPiece(current) in ["WPG", "BPG"]) and not current.equal(pos2)):
                 return False 
             dist = current.distance(pos2)
         
@@ -310,11 +311,10 @@ class Board:
             return False
         
         # Check if the piece go to a piece of the same color or to a King
-        if(originPiece[0] == destPiece[0]):
+        if((originPiece[0] == destPiece[0]) and not destPiece in ["WPG", "BPG"]):
             return False
 
-        # Check if promotion item is legal
-        
+        # Check if promotion exist
         color = ['W', 'B'][self.currentPlayer]
         if not move.promotion in [f'{color}R', f'{color}N', f'{color}B', f'{color}Q', None]:
             return False
@@ -322,7 +322,7 @@ class Board:
         # Check of check
         tmpGrid = copy.deepcopy(self.grid)
         if color == originPiece[0]:    # get player's team
-            self.movePiece(move.origin, move.dest)              # Simulate movement
+            self.play(move)              # Simulate movement
 
             if self.isCheck(): 
                 self.grid = copy.deepcopy(tmpGrid)
@@ -442,69 +442,60 @@ class Board:
         Return True if the move is played, false howerver.
         Rock is encoded: [color][small/big rock] in move.origin
         """
-        if(self.isLegalMove(move)):
-            # TODO VERIFY CHECK DURING ROCK
-            # Small Rock
-            if(move.origin[1:] == "O-O"):   
-                if move.origin[0] == 'W':
-                    line = 1
-                else:
-                    line = 8
-                self.movePiece(f"e{line}", f"f{line}") # Move king
-                self.movePiece(f"f{line}", f"g{line}")
-                self.setPiece(self.convertPosition(f"f{line}"), f"{move.origin[0]}R")  # Move rook
-                self.setPiece(self.convertPosition(f"h{line}"), '00')
-                self.removeGhost()
-
-            # Big Rock
-            elif(move.origin[1:] == "O-O-O"):  
-                if move.origin[0] == 'W':
-                    line = 1
-                else:
-                    line = 8
-                self.movePiece(f"e{line}", f"d{line}") # Move king
-                self.movePiece(f"d{line}", f"c{line}")
-                self.setPiece(self.convertPosition(f"d{line}"), f"{move.origin[0]}R") # Move rook
-                self.setPiece(self.convertPosition(f"a{line}"), '00')
-                self.removeGhost()
-
-
-            # 2 step pawn movement
-            # Add ghost piece when moving 2
-            elif(self.convertPosition(move.origin).distance(self.convertPosition(move.dest)) == 2 and move.piece[1] == 'P'):
-                self.movePiece(move.origin, move.dest)
-
-                # Format to chess cause it's int here 
-                self.setPiece(
-                    self.convertPosition(f"{move.origin[0]}{round((int(move.origin[1]) + int(move.dest[1])) / 2)}"),
-                    f"{move.piece[0]}PG"
-                ) # Set ghost piece on pawn long start
-
-            # Prise en passant
-            elif(move.piece[1] == "P" and self.getPiece(self.convertPosition(move.dest)) in ["WPG", "BPG"]):
-                pos = self.convertPosition(move.dest)
-                match move.piece[0]:
-                    case 'W':
-                        pos.x -= 1
-                    case 'B':
-                        pos.x += 1
-                self.setPiece(pos, '00')
-                self.movePiece(move.origin, move.dest)
-                self.removeGhost()
-
-            # Promotion
-            elif(move.promotion != None):
-                self.movePiece(move.origin, move.dest)
-                self.setPiece(
-                    self.convertPosition(move.dest),
-                    move.promotion
-                )
-
+        # TODO VERIFY CHECK DURING ROCK
+        # Small Rock
+        if(move.origin[1:] == "O-O"):   
+            if move.origin[0] == 'W':
+                line = 1
             else:
-                self.movePiece(move.origin, move.dest)
-                self.removeGhost()
-            return True
-        return False
+                line = 8
+            self.movePiece(f"e{line}", f"f{line}") # Move king
+            self.movePiece(f"f{line}", f"g{line}")
+            self.setPiece(self.convertPosition(f"f{line}"), f"{move.origin[0]}R")  # Move rook
+            self.setPiece(self.convertPosition(f"h{line}"), '00')
+            self.removeGhost()
+        # Big Rock
+        elif(move.origin[1:] == "O-O-O"):  
+            if move.origin[0] == 'W':
+                line = 1
+            else:
+                line = 8
+            self.movePiece(f"e{line}", f"d{line}") # Move king
+            self.movePiece(f"d{line}", f"c{line}")
+            self.setPiece(self.convertPosition(f"d{line}"), f"{move.origin[0]}R") # Move rook
+            self.setPiece(self.convertPosition(f"a{line}"), '00')
+            self.removeGhost()
+        # 2 step pawn movement
+        # Add ghost piece when moving 2
+        elif(self.convertPosition(move.origin).distance(self.convertPosition(move.dest)) == 2 and move.piece[1] == 'P'):
+            self.movePiece(move.origin, move.dest)
+            # Format to chess cause it's int here 
+            self.setPiece(
+                self.convertPosition(f"{move.origin[0]}{round((int(move.origin[1]) + int(move.dest[1])) / 2)}"),
+                f"{move.piece[0]}PG"
+            ) # Set ghost piece on pawn long start
+        # Prise en passant
+        elif(move.piece[1] == "P" and self.getPiece(self.convertPosition(move.dest)) in ["WPG", "BPG"]):
+            pos = self.convertPosition(move.dest)
+            match move.piece[0]:
+                case 'W':
+                    pos.x -= 1
+                case 'B':
+                    pos.x += 1
+            self.setPiece(pos, '00')
+            self.movePiece(move.origin, move.dest)
+            self.removeGhost()
+        # Promotion
+        elif(move.promotion != None):
+            self.movePiece(move.origin, move.dest)
+            self.setPiece(
+                self.convertPosition(move.dest),
+                move.promotion
+            )
+        else:
+            self.movePiece(move.origin, move.dest)
+            self.removeGhost()
+        return True
 
     def convertPgn(self, PGN):
         """

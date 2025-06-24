@@ -11,11 +11,6 @@ class Node:
         self.board = board       # Nom du coup
         self.childs = {}        # move -> new board
 
-        # Used for the graph visit
-        # TODO: TRY sans memoisation
-        self.distance = 0
-        self.visited = False
-        
 
     def getBoard(self):
         return self.board

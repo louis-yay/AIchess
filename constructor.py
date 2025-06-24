@@ -3,8 +3,13 @@ from saving import load, save
 from chessgame import Board
 from Node import Node
 from math import inf
+import time
+from saving import save
 
 # Maximal asbtraction version
+WHITEWIN = "1-0"
+BLACKWIN = "0-1"
+DRAW = "1/2-1/2"
 
 def constructGraph(DIR, max=1000):
     """
@@ -66,12 +71,15 @@ def constructGraph(DIR, max=1000):
 
     return _build(final)
 
+
 def _build(dataSet):
+    arretes = 0
+    noeud = 0
     board = Board()
     outDict = {
-        "1-0": Node("WWIN"),
-        "0-1": Node("BWIN"),
-        "1/2-1/2": Node("DRAW")
+        "1-0": Node("1-0"),
+        "0-1": Node("0-1"),
+        "1/2-1/2": Node("1/2-1/2")
     }
     outGraph = Node(tuple(board.makeVector()))
     outDict[tuple(board.makeVector())] = outGraph
@@ -84,47 +92,43 @@ def _build(dataSet):
             if game[i] in ["0-1", "1-0", "1/2-1/2"]:
                 ptGraph.addChild(game[i], outDict[game[i]])
             else:
-                if not board.isLegalMove(board.convertPgn(game[i])):
-                    board.display()
-                    print(board.isLegalMove(board.convertPgn(game[i])))
-                    raise ValueError
                 board.play(board.convertPgn(game[i]))
-                # board.display()
                 board.nextTurn()
                 vector = tuple(board.makeVector())
-                if vector in list(outDict.keys()):
+                arretes += 1
+                
+                if vector in outDict:
 
                     # Make connexion between current and new
                     ptGraph = ptGraph.addChild(game[i], outDict[vector])
                 else:   
+                    
                     # Make connexion from current node to new node
+                    noeud += 1
                     ptGraph = ptGraph.addChild(game[i], Node(vector))
                     outDict[vector] = ptGraph
     
+    print(f"NB OF CONNEXIONS : {arretes}")
+    print(f"NB OF NODE: {noeud}")
+
     return (outGraph, outDict)
 
 
-graph, dic = constructGraph("data", 100)
-print(len(dic))
+
+def getDistance(graph, dic: dict, dest):
+    for key in dic:
+        dic[key] = [dic[key], inf, False]   # (Node, distance, visited)
+    dic[graph.board] = [dic[graph.board], 0, False]
+    return _parcours(graph, dic, dest)
 
 
-# # TODO the algo
-# # TODO: faire des tests sur des cas particulier (linéaire, boucle, etc...)
-# def getDistance(graph, dic: dict, dest = "WWIN"):
-#     for key in dic:
-#         dic[key].distance = inf
-#         dic[key].visited = False
-#     graph.distance = 0
-#     return _parcours(graph)
-# 
-# 
-# def _parcours(graph, dest = "WWIN"):
-#     print(type(graph.board))
-#     if graph.board == "WWIN" or graph.board == "BWIN" or graph.board == "DRAW":
-#         return graph.distance
-#     for childKey in graph.getChilds():
-#         graph.getChilds()[childKey].distance = graph.distance + 1
-#         _parcours(graph.getChilds()[childKey])
-# 
-# graph, dic = constructGraph("data", 10)
-# print(getDistance(graph, dic))
+def _parcours(graph, dic, dest):
+    if graph.board == dest:
+        return 1 #dic[graph.board][1]
+    for childKey in graph.getChilds():
+        child = graph.getChilds()[childKey]
+        if(not dic[child.board][2]):    # this node as not been visited
+            dic[child.board][2] = True  # Set the node as visited
+            # dic[child.board][1] = dic[graph.board][1] + 1 # Update distance as current distance + 1 
+            return 1 + _parcours(child, dic, dest)
+    return 0
