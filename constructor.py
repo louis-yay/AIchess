@@ -77,9 +77,9 @@ def _build(dataSet):
     noeud = 0
     board = Board()
     outDict = {
-        "1-0": Node(WHITEWIN),
-        "0-1": Node(BLACKWIN),
-        "1/2-1/2": Node(DRAW)
+        WHITEWIN: Node(WHITEWIN),
+        BLACKWIN: Node(BLACKWIN),
+        DRAW: Node(DRAW)
     }
     outGraph = Node(tuple(board.makeVector()))
     outDict[tuple(board.makeVector())] = outGraph
@@ -90,7 +90,14 @@ def _build(dataSet):
         ptGraph = outGraph  # graph pointer
         for i in range(len(game)):
             if game[i] in ["0-1", "1-0", "1/2-1/2"]:
-                ptGraph.addChild(game[i], outDict[game[i]])
+                match game[i]:
+                    case "0-1":
+                        ptGraph.addChild(game[i], outDict[BLACKWIN])
+                    case "1-0":
+                        ptGraph.addChild(game[i], outDict[WHITEWIN])
+                    case "1/2-1/2":
+                        ptGraph.addChild(game[i], outDict[DRAW])
+                
             else:
                 board.play(board.convertPgn(game[i]))
                 board.nextTurn()

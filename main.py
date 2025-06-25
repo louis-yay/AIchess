@@ -6,27 +6,24 @@ from Node import Node
 from saving import save, load
 import time
 from math import inf
+import copy
 
 
 
 # Game init
 board = Board()
 
-graph = load("models/2000GamesGraph.pkl")
-dic = load("models/2000GamesDict.pkl")
-        
+graph, dic = constructGraph("data", max=50)
+
 # user play the white
 gamelog = []
 running = True
 
-
-graph, index = constructGraph("data", max=50)
-
 def getDistance(graph, dic: dict, dest):
-    for key in dic:
-        dic[key] = [dic[key], inf, False]   # (Node, distance, visited)
-    dic[graph.board] = [dic[graph.board], 0, False]
-    return _parcours(graph, dic, dest)
+    tmpDic = {}
+    for key in dic.keys():
+        tmpDic[key] = [dic[key], False]
+    return _parcours(graph, tmpDic, dest)
 
 
 def _parcours(graph, dic, dest):
@@ -34,8 +31,8 @@ def _parcours(graph, dic, dest):
         return 1 #dic[graph.board][1]
     for childKey in graph.getChilds():
         child = graph.getChilds()[childKey]
-        if(not dic[child.board][2]):    # this node as not been visited
-            dic[child.board][2] = True  # Set the node as visited
+        if(not dic[child.board][1]):    # this node as not been visited
+            dic[child.board][1] = True  # Set the node as visited
             # dic[child.board][1] = dic[graph.board][1] + 1 # Update distance as current distance + 1 
             return 1 + _parcours(child, dic, dest)
     return 0
@@ -45,10 +42,10 @@ def next():
     move = None
     vector = tuple(board.makeVector())
     if vector in dic:
-        current = dic[vector]   # Get the current board state node
+        current = dic[vector]  # Get the current board state node
 
         # Sorted list of all current node's child by distance to current player's team
-        issues = sorted([(key, getDistance(current.getChilds()[key], dic, board.currentPlayer)) for key in list(current.getChilds().keys())], key=lambda tup:tup[1])
+        issues = sorted([(key, getDistance(current.getChilds()[key], dic, board.currentPlayer)) for key in current.getChilds()], key=lambda tup:tup[1])
         while issues != []:
             if(board.isLegalMove(board.convertPgn(issues[0][0]))):
                 return issues[0][0]
@@ -56,8 +53,6 @@ def next():
 
     print("Computer resign.")
     exit()
-
-
 
 
 while running:
@@ -79,6 +74,9 @@ while running:
     board.play(move)
     board.display()
     board.nextTurn()
+    if board.isCheckMate():
+        print("User Win.")
+        exit()
 
     # log the game
     gamelog.append(PGN)
@@ -89,8 +87,12 @@ while running:
     move = board.convertPgn(PGN)
     print(f"Computer played: {move.origin} -> {move.dest}")
     board.play(move)
+    gamelog.append(PGN)
     board.display()
     board.nextTurn()
+    if board.isCheckMate():
+        print("Computer win.")
+        exit()
 
     print("\n\n###########################")
     print(f"Current log: [[[ {gamelog} ]]]")

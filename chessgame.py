@@ -86,9 +86,8 @@ class Board:
         ]
         With boolean indication if the piece is, or not, in the speficied case
         Here is the order of the pieces:
-        00, WP, WPG, WR, WN, WB, WQ, WK, BP, BPG, BR, BN, BB, BQ, BK
+        WP, WR, WN, WB, WQ, WK, BP, BR, BN, BB, BQ, BK
         """
-        #TODO: ne pas embarquer l'historique (pion fantome)
         # Case vide déterminable après coup
         vector = []
         pieces = ['WP', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP', 'BR', 'BN', 'BB', 'BQ', 'BK']
@@ -414,6 +413,36 @@ class Board:
                         return True
 
         return False
+    
+    def isCheckMate(self):
+        """
+        Check if the current player is checkmate
+        """
+        if self.isCheck():
+            color = ['W', 'B'][self.currentPlayer]
+            kingPos = ""
+
+            # Find ally king
+            for x in range(8):
+                for y in range(8):
+                    if(self.grid[x][y] == f"{color}K"):
+                        kingPos = f"{chr(ord('h') - y)}{x + 1}"
+                        break
+
+            # For every piece
+            for i in range(8):
+                for j in range(8):
+
+                    # If the piece is an ally
+                    # Check for every piece move if it can save the king from checkmate
+                    if(not self.isEnemy(self.grid[i][j])):
+
+                        if(self.isLegalMove(Movement(origin=f"{chr(ord('h') - j)}{i + 1}", dest=kingPos))):
+                            return False
+                    
+            return True
+        return False
+        
 
     def getLegalMoves(self):
         """
