@@ -13,7 +13,10 @@ import copy
 # Game init
 board = Board()
 
-graph, dic = constructGraph("data", max=50)
+# Loading model
+constructGraph("data", 10000)
+graph = load("models/2000GamesGraph.pkl")
+dic = load("models/2000GamesDict.pkl")
 
 # user play the white
 gamelog = []
