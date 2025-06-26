@@ -71,6 +71,9 @@ class Board:
             ['00', '00', '00', '00', '00', '00', 'BP', '00']  # 8
         ]
 
+    def setGrid(self, grid):
+        self.grid = grid
+
     def makeVector(self):
         """
         Make a vector in the following form:
@@ -418,7 +421,9 @@ class Board:
         """
         Check if the current player is checkmate
         """
+        issueFound = True
         if self.isCheck():
+            issueFound = False
             color = ['W', 'B'][self.currentPlayer]
             kingPos = ""
 
@@ -435,13 +440,22 @@ class Board:
 
                     # If the piece is an ally
                     # Check for every piece move if it can save the king from checkmate
-                    if(not self.isEnemy(self.grid[i][j])):
+                    piece = self.getPiece(Position(i,j))
+                    if(piece[0] == color):
+                        grid = copy.deepcopy(self.grid)
 
-                        if(self.isLegalMove(Movement(origin=f"{chr(ord('h') - j)}{i + 1}", dest=kingPos))):
-                            return False
+
+                        for x in range(8):
+                            for y in range(8):
+                                move = Movement(piece=piece, origin=f"{chr(ord('h') - j)}{i + 1}", dest=f"{chr(ord('h') - y)}{x + 1}")
+                                if self.isLegalMove(move):
+                                    board.play(move)
+                                    if not self.isCheck():
+                                        issueFound = True
+                                    self.setGrid(copy.deepcopy(grid))
+                            
                     
-            return True
-        return False
+        return not issueFound
         
 
     def getLegalMoves(self):
@@ -594,3 +608,18 @@ class Board:
                 output.promotion = f"{output.piece[0]}{PGN[1]}"
 
         return output
+
+board = Board()
+grid = [
+            # h     g     f      e    d     c     b     a     y/x
+            ['00', '00', '00', '00', '00', '00', '00', 'WK'], # 1
+            ['00', '00', '00', '00', 'BR', '00', 'BQ', '00'], # 2
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 7
+            ['00', '00', '00', '00', '00', '00', '00', '00']  # 8
+        ]
+board.setGrid(grid)
+print(board.isCheckMate())

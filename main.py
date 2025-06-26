@@ -14,7 +14,6 @@ import copy
 board = Board()
 
 # Loading model
-constructGraph("data", 10000)
 graph = load("models/2000GamesGraph.pkl")
 dic = load("models/2000GamesDict.pkl")
 
