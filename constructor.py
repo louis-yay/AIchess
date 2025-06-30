@@ -1,19 +1,61 @@
 import os
-from saving import load, save
+import random
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from model import Model
 from chessgame import Board
-from Node import Node
-from math import inf
-import time
-from saving import save
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
-# Maximal asbtraction version
-WHITEWIN = False
-BLACKWIN = True
-DRAW = None
-
-def constructGraph(DIR, max=1000):
+def pgnToVector(PGN):
     """
-    Return a dictionnarie of index for the graph nodes AND, the graph itselve
+    Return a vector the following form:
+    [
+        a1: False,
+        a2: False,
+        a3: False,
+        ...
+        a8: False,
+        ...
+        Qf3: True,
+        etc...
+    ]
+    """
+    out = [PGN == 'O-O', PGN=='O-O-O']
+    for piece in ['', 'R', 'N', 'B', 'Q', 'K']:
+        for i in range(8):
+            for j in range(1, 9):
+                out.append(PGN == f"{piece}{chr(ord('a')+i)}{j}")
+
+    return out
+                
+def vectorToPgn(vector):
+    if vector[0]:
+        return 'O-O'
+    elif vector[1]: 
+        return 'O-O-O'
+    vector = vector[2:]
+
+    pieces = ['', 'R', 'N', 'B', 'Q', 'K']
+    for pieceIndex in range(len(pieces)):
+        for i in range(8):
+            for j in range(8):
+                if(vector[(pieceIndex*8*8)+i*8+j]):
+                    return f"{pieces[pieceIndex]}{chr(ord('a')+i)}{j+1}"
+
+
+
+def constructDataSet(DIR, max=1):
+    """
+    we want a list:
+    [
+        [VECTOR]: Move to play,
+        [VECTOR]: move to play,
+        ...
+        [VECTOR]: Move to play,
+        [VECTOR]: move to play,
+    ]
     """
     # 1. Create a tab from a game
     data = []   # <- a list of game
@@ -32,6 +74,8 @@ def constructGraph(DIR, max=1000):
                     index += 1
         del reader
 
+    # Randomise datset game's order.
+    random.shuffle(data)
 
     # Remplace every \n by space
     # Split the string by space to get move one to one
@@ -44,7 +88,7 @@ def constructGraph(DIR, max=1000):
             data[i].remove("")
         
 
-    final = [ [] for i in range(len(data))]
+    formated = [ [] for i in range(len(data))]
 
     # Formating move
     for i in range(len(data)):
@@ -57,66 +101,90 @@ def constructGraph(DIR, max=1000):
             except IndexError:
                 move = move[0]
 
-            # Remove abiguiti correction from PGN notation
-            # if(len(move) > 2 and (not ('=' in move)) and move[0] != 'O'):   
-            #     if(move[-3] in ['R', 'N', 'B', 'Q', 'K']):  # for figures
-            #         move = move[-3:]
-            #     else:                                       # for Pawns
-            #         move = move[-2:]
-            # elif(len(move) > 2 and '=' in move and move[0] != 'O'):
-            #     move = move[-4:]
-
-            final[i].append(move)
-        final[i].append(data[i][-1])
-
-    return _build(final)
+            formated[i].append(move)
+        formated[i].append(data[i][-1])
 
 
-def _build(dataSet):
-    arretes = 0
-    noeud = 0
+    #
+    X_train = []
+    Y_train = []
     board = Board()
-    outDict = {
-        WHITEWIN: Node(WHITEWIN),
-        BLACKWIN: Node(BLACKWIN),
-        DRAW: Node(DRAW)
-    }
-    outGraph = Node(tuple(board.makeVector()))
-    outDict[tuple(board.makeVector())] = outGraph
-
-    for game in dataSet:
+    for i in range(len(formated)):
         board.resetGrid()
         board.currentPlayer = Board.WHITE
-        ptGraph = outGraph  # graph pointer
-        for i in range(len(game)):
-            if game[i] in ["0-1", "1-0", "1/2-1/2"]:
-                match game[i]:
-                    case "0-1":
-                        ptGraph.addChild(game[i], outDict[BLACKWIN])
-                    case "1-0":
-                        ptGraph.addChild(game[i], outDict[WHITEWIN])
-                    case "1/2-1/2":
-                        ptGraph.addChild(game[i], outDict[DRAW])
-                
-            else:
-                board.play(board.convertPgn(game[i]))
-                board.nextTurn()
-                vector = tuple(board.makeVector())
-                arretes += 1
-                
-                if vector in outDict:
+        for j in range(len(formated[i])-2):
+            
+            # Make VECTOR -> Move combinaison
+            X_train.append(board.makeVector())
+            Y_train.append(pgnToVector(formated[i][j]))
+            if not True in Y_train[-1]:
+                # cd5 don't is not catched by pgnToVector.
+                print("Should have a True")
+            move = board.convertPgn(formated[i][j])
+            board.play(move)
+            board.nextTurn()
 
-                    # Make connexion between current and new
-                    ptGraph = ptGraph.addChild(game[i], outDict[vector])
-                else:   
-                    
-                    # Make connexion from current node to new node
-                    noeud += 1
-                    ptGraph = ptGraph.addChild(game[i], Node(vector))
-                    outDict[vector] = ptGraph
+    X_train = torch.FloatTensor(X_train)
+    Y_train = torch.FloatTensor(Y_train)
+
+    return (X_train, Y_train)
+
+def constructModel(X_train, Y_train, epochs=100):
+    model = Model()
+    criterion = nn.CrossEntropyLoss()
+
+    # Choose Adam optim, popular, lr=learning rate
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+
+    losses = []
+    for i in range(epochs):
+        y_pred = model.forward(X_train) # Get predicted results
+
+        # Measure the loss/error, gonna be high at first
+        loss = criterion(y_pred, Y_train) # predicted values vs the y_train     
+        
+        # Keep Track of our losses
+        losses.append(loss.detach().numpy())        
+        
+        # print every 10 epoch
+        if i % 10 == 0:
+          print(f'Epoch: {i} and loss: {loss}')     
+        # Do some back propagation: take the error rate of forward propagation and feed it back
+        # thru the network to fine tune the weights
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+    return model, losses
     
-    print(f"NB OF CONNEXIONS : {arretes}")
-    print(f"NB OF NODE: {noeud}")
+EPOCHS = 30
+DATASET_SIZE = 100
 
-    return (outGraph, outDict)
+b = Board()
+X, Y = constructDataSet("data", max=DATASET_SIZE)
 
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1)
+
+print("CONSTRUCTING MODEL")
+model, losses = constructModel(X_train, Y_train, epochs=EPOCHS) 
+
+# TEST OF OUR MODEL:
+correct = 0
+with torch.no_grad():
+    for i, data in enumerate(X_test):
+        y_val = model.forward(data)   
+
+        # Correct or not
+        normal = Y_test[i].tolist()
+        if y_val.argmax().item() == normal.index(1.):
+            correct +=1
+
+print(f'We got {correct} correct on {len(X_test)} ! \t({correct/len(X_test)*100}% success rate.)')
+
+# Display loss evolution
+plt.plot(range(EPOCHS), losses)
+plt.ylabel("loss/error")
+plt.xlabel('Epoch')
+plt.legend()
+plt.show()

@@ -61,14 +61,14 @@ class Board:
         """
         self.grid = [
             # a     b    c       d     e     f     g     h   y/x
-            ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 1
-            ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 2
-            ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 3
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 1
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 2
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 4
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 5
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 6
-            ['00', '00', '00', '00', '00', '00', 'BP', '00'], # 7
-            ['00', '00', '00', '00', '00', '00', 'BP', '00']  # 8
+            ['00', '00', '00', '00', '00', '00', '00', '00'], # 7
+            ['00', '00', '00', '00', '00', '00', '00', '00']  # 8
         ]
 
     def setGrid(self, grid):
@@ -92,7 +92,7 @@ class Board:
         WP, WR, WN, WB, WQ, WK, BP, BR, BN, BB, BQ, BK
         """
         # Case vide déterminable après coup
-        vector = []
+        vector = [self.currentPlayer]
         pieces = ['WP', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP', 'BR', 'BN', 'BB', 'BQ', 'BK']
         for n in range(len(pieces)):
             for i in range(8):
@@ -106,6 +106,7 @@ class Board:
     def setGridFromVector(self, vector):
         pieces = ['WP', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP', 'BR', 'BN', 'BB', 'BQ', 'BK']
         self.resetEmpty()
+        self.currentPlayer = vector.pop(0)
         for n in range(len(pieces)):
             for i in range(8):
                 for j in range(8):

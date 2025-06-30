@@ -33615,7 +33615,6 @@
 [WhiteElo "2694"]
 [BlackElo "2675"]
 
-
 1.d4 Nf6 2.c4 e6 3.Nf3 d5 4.Nc3 Bb4 5.Bg5 dxc4 6.e4 c5 7.Bxc4 cxd4 8.Nxd4 Qa5
 9.Bd2 Qc5 10.Bb5+ Bd7 11.Nb3 Qc7 12.Bd3 O-O 13.O-O Rd8 14.Qe2 Nc6 15.Nb5 Qb8
 16.Bg5 Be7 17.Rad1 Ne5 18.Nc3 h6 19.Bf4 Bd6 20.Bg3 Ng6 21.Bxd6 Qxd6 22.g3 Bc6
@@ -33637,7 +33636,6 @@
 [Result "1-0"]
 [WhiteElo "2606"]
 [BlackElo "2694"]
-
 
 1.e4 c6 2.d4 d5 3.e5 Bf5 4.h4 h6 5.h5 e6 6.c4 Ne7 7.Nc3 Nd7 8.Nf3 a6 9.Bd3 dxc4
 10.Bxc4 Nd5 11.Nxd5 cxd5 12.Bd3 Bb4+ 13.Kf1 Bxd3+ 14.Qxd3 Qc7 15.Be3 Qc4

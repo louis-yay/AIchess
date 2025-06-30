@@ -5915,7 +5915,6 @@
 [WhiteElo "2539"]
 [BlackElo "2596"]
 
-
 1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4 Bc5 5.c3 d3 6.b4 Bb6 7.a4 a6 8.a5 Ba7 9.Qb3 Qe7
 10.O-O d6 11.b5 axb5 12.a6 Nf6 13.Bg5 O-O 14.Bd5 Bb6 15.Nbd2 Rb8 16.Qxb5 Na7
 17.Qxd3 bxa6 18.Rfe1 Be6 19.Rxa6 h6 20.Bh4 g5 21.Bg3 Nh5 22.Rea1 Nc8 23.Nc4 Nxg3
@@ -5934,7 +5933,6 @@
 [Result "0-1"]
 [WhiteElo "2539"]
 [BlackElo "2596"]
-
 
 1.e4 c5 2.Nc3 a6 3.Nf3 Nc6 4.g3 g6 5.Bg2 Bg7 6.O-O d6 7.d3 Nf6 8.Bf4 O-O
 9.Qd2 e5 10.Bg5 Be6 11.Nh4 Qd7 12.f4 exf4 13.gxf4 h6 14.f5 hxg5 15.fxe6 Qxe6
@@ -5956,7 +5954,6 @@
 [WhiteElo "2596"]
 [BlackElo "2539"]
 
-
 1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 g6 6.Be2 Bg7 7.O-O O-O 8.Re1 Nc6
 9.Nb3 Be6 10.Bf1 Rc8 11.Nd5 Nd7 12.c3 a5 13.Bg5 h6 14.Be3 a4 15.Nd4 Bxd5
 16.exd5 Nxd4 17.Bxd4 Bxd4 18.Qxd4 a3 19.b4 Rc7 20.c4 Ne5 21.c5 Nd7 22.Rac1 dxc5
@@ -5972,7 +5969,6 @@
 [Result "1/2-1/2"]
 [WhiteElo "2740"]
 [BlackElo "2596"]
-
 
 1.e4 c5 2.Nf3 e6 3.b3 a6 4.Bb2 Nc6 5.d4 cxd4 6.Nxd4 Nf6 7.Bd3 Bb4+ 8.Nd2 Qa5
 9.a3 Be7 10.O-O Ne5 11.N4f3 Nxd3 12.cxd3 b5 13.b4 Qb6 14.Bd4 Qd8 15.Nb3 O-O
@@ -5994,7 +5990,6 @@
 [WhiteElo "2596"]
 [BlackElo "2740"]
 
-
 1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.d4 d6
 9.c3 Bg4 10.Be3 Bh5 11.h3 exd4 12.cxd4 Na5 13.Bc2 Nc4 14.Bc1 c5 15.b3 Nb6
 16.Nbd2 cxd4 17.Bb2 d3 18.Bxd3 Nfd7 19.g4 Bg6 20.Nd4 Ne5 21.Bf1 Bg5 22.N2f3 Bf4
@@ -6012,7 +6007,6 @@
 [Result "1-0"]
 [WhiteElo "2740"]
 [BlackElo "2596"]
-
 
 1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nc3 Qc7 6.f4 a6 7.Nf3 d6 8.Bd3 Nf6
 9.O-O Be7 10.Qe1 O-O 11.Kh1 b5 12.e5 Nd7 13.exd6 Qxd6 14.Ne4 Qc7 15.Bd2 Bb7

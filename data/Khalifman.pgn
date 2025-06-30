@@ -29788,7 +29788,6 @@
 [WhiteElo "2414"]
 [BlackElo "2622"]
 
-
 1.e4 c5 2.Nf3 b6 3.d4 cxd4 4.Nxd4 Bb7 5.Bd3 g6 6.b3 Bg7 7.Bb2 Nf6 8.e5 Nh5
 9.Nf5  1/2-1/2
 
@@ -29801,7 +29800,6 @@
 [Result "1/2-1/2"]
 [WhiteElo "2622"]
 [BlackElo "2669"]
-
 
 1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.e3 e6 5.Bd3 Nbd7 6.O-O Bd6 7.Nc3 dxc4 8.Bxc4 b5
 9.Bd3  1/2-1/2
@@ -29816,7 +29814,6 @@
 [WhiteElo "2454"]
 [BlackElo "2622"]
 
-
 1.d4  1/2-1/2
 
 [Event "Liepajas Rokade"]
@@ -29829,7 +29826,6 @@
 [WhiteElo "2622"]
 [BlackElo "2685"]
 
-
 1.d4 Nf6 2.Nf3 e6 3.c4 d5 4.g3 dxc4 5.Qa4+  1/2-1/2
 
 [Event "Liepajas Rokade"]
@@ -29841,7 +29837,6 @@
 [Result "1/2-1/2"]
 [WhiteElo "2622"]
 [BlackElo "2445"]
-
 
 1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Nf3 c5 5.g3 cxd4 6.Nxd4 Ne4 7.Qd3 Qa5 8.Nb3 Nxc3
 9.Bd2 Ne4 10.Qxe4 Bxd2+ 11.Nxd2 Nc6 12.Bg2 O-O 13.Qc2 Qh5 14.Nf3 d5 15.cxd5 exd5
@@ -29859,7 +29854,6 @@
 [Result "1/2-1/2"]
 [WhiteElo "2622"]
 [BlackElo "2527"]
-
 
 1.d4 Nf6 2.Nf3 e6 3.c4 Bb4+ 4.Nbd2 c5 5.a3 Bxd2+ 6.Bxd2 b6 7.Bg5 h6 8.Bh4 Bb7
 9.e3 cxd4 10.Qxd4 Nc6 11.Qd1 Rc8 12.Rc1 d6 13.Bd3 g5 14.Bg3 Rg8 15.Bb1 Ke7
@@ -39353,7 +39347,6 @@
 [Result "1-0"]
 [WhiteElo "2617"]
 [BlackElo ""]
-
 
 1.d4 Nf6 2.Nf3 d6 3.c4 g6 4.g3 Bg7 5.Bg2 O-O 6.O-O Nbd7 7.Nc3 e5 8.e4 Ne8
 9.Bg5 f6 10.Be3 f5 11.dxe5 Nxe5 12.Nxe5 Bxe5 13.exf5 Bxf5 14.Bxb7 Rb8 15.Bd5+ Kh8

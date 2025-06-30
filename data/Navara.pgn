@@ -9497,7 +9497,6 @@
 [WhiteElo "2606"]
 [BlackElo "2616"]
 
-
 1.c4 g6 2.g3 Bg7 3.Bg2 c5 4.Nc3 Nc6 5.d3 e6 6.Nh3 Nge7 7.Nf4 b6 8.Qd2 Bb7
 9.b3 d6 10.Bb2 Qd7 11.Ne4 e5 12.Nd5 Nxd5 13.cxd5 Ne7 14.Nc3 f5 15.O-O O-O
 16.f4 Rae8 17.e4 Kh8 18.Kh1 fxe4 19.dxe4 Ng8 20.Rae1 Bc8 21.Nd1 Ba6 22.Rf2 exf4
@@ -9521,7 +9520,6 @@
 [Result "0-1"]
 [WhiteElo "2606"]
 [BlackElo "2616"]
-
 
 1.c4 e5 2.Nc3 Nf6 3.Nf3 Nc6 4.d3 Bb4 5.Bd2 O-O 6.e3 Re8 7.Be2 d6 8.O-O Bf5
 9.a3 Bxc3 10.Bxc3 e4 11.Nd4 Nxd4 12.Bxd4 exd3 13.Bxd3 Bxd3 14.Qxd3 Nd7 15.b3 Qg5
@@ -9558,7 +9556,6 @@
 [WhiteElo "2616"]
 [BlackElo "2606"]
 
-
 1.Nf3 c5 2.c4 Nc6 3.Nc3 Nf6 4.g3 d5 5.d4 e6 6.cxd5 Nxd5 7.Bg2 cxd4 8.Nxd4 Nxc3
 9.bxc3 Nxd4 10.Qxd4 Qxd4 11.cxd4 Bb4+ 12.Bd2 Bxd2+ 13.Kxd2 Kd8 14.Rhc1 Re8
 15.Rc3 Re7 16.Rac1 Rb8 17.f4 b6 18.g4 h6 19.g5 hxg5 20.fxg5 Bb7 21.Bxb7 Rexb7
@@ -9579,7 +9576,6 @@
 [Result "1/2-1/2"]
 [WhiteElo "2616"]
 [BlackElo "2606"]
-
 
 1.d4 Nf6 2.c4 e6 3.Nc3 Bb4 4.Qc2 O-O 5.a3 Bxc3+ 6.Qxc3 b6 7.Bg5 Bb7 8.e3 d6
 9.Ne2 Nbd7 10.Qd3 Ba6 11.b4 c5 12.b5 Bb7 13.Nc3 Qe7 14.Be2 h6 15.Bxf6 Nxf6
@@ -60741,7 +60737,6 @@
 [Result "1/2-1/2"]
 [WhiteElo "2685"]
 [BlackElo "2559"]
-
 
 1.e4 c5 2.Nf3 Nc6 3.Bb5 Nf6 4.Nc3 Qc7 5.O-O Nd4 6.Re1 a6 7.Bf1 Ng4 8.e5 Nxf3+
 9.Qxf3 Nxe5 10.Qe4 d6 11.d4 cxd4 12.Nd5 Qd8 13.Qxd4 e6 14.f4 exd5 15.fxe5 Be6
