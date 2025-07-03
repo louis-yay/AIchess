@@ -1,19 +1,23 @@
 from chessgame import Board
-import random
-from constructor import constructDataSet
-import time
-import time
-from math import inf
-import copy
+from constructor import constructDataSet, VectorToMove
+from model import Model
+import torch
 
 
 
 # Game init
 board = Board()
 
+model = Model()
+model.load_state_dict(torch.load('800Games140EpochsModel.pt'))
 
 def next():
-    return None
+    val = model.forward(torch.FloatTensor(board.makeVector()))
+    vector = [False for i in range(len(val))]
+    vector[val.argmax().item()] = True
+    move = VectorToMove(vector)
+    print(f"{move.origin} -> {move.dest}")
+    exit()
 
 # user play the white
 gamelog = []

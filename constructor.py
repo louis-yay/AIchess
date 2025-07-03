@@ -3,46 +3,42 @@ import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from model import Model
+from model import Model, VECTOR_SIZE, POSSIBLE_MOVE
 from chessgame import Board
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from movement import Movement
+import time
 
-def pgnToVector(PGN):
+                
+def moveToVector(move):
     """
-    Return a vector the following form:
-    [
-        a1: False,
-        a2: False,
-        a3: False,
-        ...
-        a8: False,
-        ...
-        Qf3: True,
-        etc...
-    ]
+    Return a list of all possible move,
+    using chess notation [originSquare][destinationSquare]
     """
-    out = [PGN == 'O-O', PGN=='O-O-O']
-    for piece in ['', 'R', 'N', 'B', 'Q', 'K']:
-        for i in range(8):
-            for j in range(1, 9):
-                out.append(PGN == f"{piece}{chr(ord('a')+i)}{j}")
+    out = [move.origin[1:] == "O-O", move.origin[1:] == "O-O-O"]
+    moveString = move.origin + move.dest
+    for originX in range(8):
+        for originY in range(8):
+            for destX in range(8):
+                for destY in range(8):
+                    out.append(f"{chr(ord('a') + originX)}{originY + 1}{chr(ord('a') + destX)}{destY + 1}" == moveString)
 
     return out
-                
-def vectorToPgn(vector):
-    if vector[0]:
-        return 'O-O'
-    elif vector[1]: 
-        return 'O-O-O'
-    vector = vector[2:]
 
-    pieces = ['', 'R', 'N', 'B', 'Q', 'K']
-    for pieceIndex in range(len(pieces)):
-        for i in range(8):
-            for j in range(8):
-                if(vector[(pieceIndex*8*8)+i*8+j]):
-                    return f"{pieces[pieceIndex]}{chr(ord('a')+i)}{j+1}"
+
+def VectorToMove(vector):
+    """
+    take a vector and return a move
+    using chess notation [originSquare][destinationSquare]
+    """
+    for originX in range(8):
+        for originY in range(8):
+            for destX in range(8):
+                for destY in range(8):
+                    if(vector[originX*(8**3)+originY*(8**2)+destX*8+destY]):
+                        return Movement(origin=f"{chr(ord('a') + originX)}{originY + 1}",dest=f"{chr(ord('a') + destX)}{destY + 1}")
+
 
 
 
@@ -115,12 +111,12 @@ def constructDataSet(DIR, max=1):
         for j in range(len(formated[i])-2):
             
             # Make VECTOR -> Move combinaison
+            move = board.convertPgn(formated[i][j])
             X_train.append(board.makeVector())
-            Y_train.append(pgnToVector(formated[i][j]))
+            Y_train.append(moveToVector(move))
             if not True in Y_train[-1]:
                 # cd5 don't is not catched by pgnToVector.
                 print("Should have a True")
-            move = board.convertPgn(formated[i][j])
             board.play(move)
             board.nextTurn()
 
@@ -134,7 +130,7 @@ def constructModel(X_train, Y_train, epochs=100):
     criterion = nn.CrossEntropyLoss()
 
     # Choose Adam optim, popular, lr=learning rate
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    optimizer = torch.optim.Adagrad(model.parameters(), lr=0.01)
 
     losses = []
     for i in range(epochs):
@@ -146,11 +142,10 @@ def constructModel(X_train, Y_train, epochs=100):
         # Keep Track of our losses
         losses.append(loss.detach().numpy())        
         
-        # print every 10 epoch
-        if i % 10 == 0:
+        # print every epoch
+        if i % 1 == 0:
           print(f'Epoch: {i} and loss: {loss}')     
         # Do some back propagation: take the error rate of forward propagation and feed it back
-        # thru the network to fine tune the weights
         
         optimizer.zero_grad()
         loss.backward()
@@ -158,16 +153,20 @@ def constructModel(X_train, Y_train, epochs=100):
 
     return model, losses
     
-EPOCHS = 30
-DATASET_SIZE = 100
+EPOCHS = 50
+DATASET_SIZE = 200
 
-b = Board()
+# BASE
+print("COMPUTING DATA")
+start = time.time()
 X, Y = constructDataSet("data", max=DATASET_SIZE)
-
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
 
 print("CONSTRUCTING MODEL")
 model, losses = constructModel(X_train, Y_train, epochs=EPOCHS) 
+end = time.time()
+print(f"Formation time: {end-start}")
+
 
 # TEST OF OUR MODEL:
 correct = 0
@@ -180,11 +179,38 @@ with torch.no_grad():
         if y_val.argmax().item() == normal.index(1.):
             correct +=1
 
+# EPOCHS: 140, DATASET 800; sucess rate: 16% (training time: 1h23)
+# 4 time sized layer, 200/50 success rate: 8.8%
+# 2 time sized layer, 200/50 success rate: 9.9% (training time: 4m)
+# 2 then 4 time sized layer, 200/50 success rate: 7.5%
+# 4 then 2 time sized layer, 200/50 sucess rate 9.9%: 
+# 3 time sized layer, 200/50 sucess rate: 9.0%
+# 4 then 3 time sized layer, 200/50 success rate: 7.5%
+
+# NOW WE KEEP 2 time sized layer, 200/50 and change learning rate:
+# LR = 0.05 => 6.2%
+# LR = 0.01 => 9.9%
+# LR = 0.02 => 3.9%
+
+# OTHER 
+# BASIC 1300/10 => 1%
+# 200/50 relu only at the end => 10.6%
+# 400/90 relu only at the end => 15.0%
+# 600/110 relu only at the end => 16.3% (training time: 17m)
+# 800/140 relu only at the end => % (taining time: )
+
+# OPTIMISER 200/50 & relu only at the end & LR = 0.01:
+# ADAM => %
+# SGD => 0.04%
+# SGD (relu on every step) => 0.19%
+# RMSprop => 1.5%
+# RMSprop (relu on every step) =>  6.8%
+# Adagrad => 5.4%
+# Adagrad (relu on evert step) =>  %
+
+
 print(f'We got {correct} correct on {len(X_test)} ! \t({correct/len(X_test)*100}% success rate.)')
 
-# Display loss evolution
-plt.plot(range(EPOCHS), losses)
-plt.ylabel("loss/error")
-plt.xlabel('Epoch')
-plt.legend()
-plt.show()
+print("SAVING...")
+torch.save(model.state_dict(), f'{DATASET_SIZE}Games{EPOCHS}EpochsModel.pt')
+
