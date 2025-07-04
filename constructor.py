@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from movement import Movement
 import time
+import json
 
                 
 def moveToVector(move):
@@ -60,58 +61,23 @@ def constructDataSet(DIR, max=1):
     # Extract every game needed from files 
     for file in sorted(os.listdir(DIR)):
         with open(DIR + "/" + file, "r", errors='ignore') as file:
-            index += 1
+                reader = file.read().split("\n")
+                for i in range(len(reader)-1):
+                    if index < max:
+                        data.append(reader[i].split(" "))
+                        index += 1
+    
 
-            # Read only the moves part of the game
-            reader = file.read().split("\n\n")
-            for i in range(1, len(reader), 2):
-                if index < max:
-                    data.append(reader[i])
-                    index += 1
-        del reader
-
-    # Randomise datset game's order.
-    random.shuffle(data)
-
-    # Remplace every \n by space
-    # Split the string by space to get move one to one
-    for i in range(len(data)):
-        data[i] = data[i].replace("\n", " ")
-        data[i] = data[i].replace("+", "")      # Don't keep the check note
-        data[i] = data[i].replace("x", "")      # Don't keep take note
-        data[i] = data[i].split(" ")
-        while "" in data[i]:
-            data[i].remove("")
-        
-
-    formated = [ [] for i in range(len(data))]
-
-    # Formating move
-    for i in range(len(data)):
-        for j in range(len(data[i])-1):
-            move = data[i][j].split(".")
-
-            # Remove turn number
-            try:
-                move = move[1]
-            except IndexError:
-                move = move[0]
-
-            formated[i].append(move)
-        formated[i].append(data[i][-1])
-
-
-    #
     X_train = []
     Y_train = []
     board = Board()
-    for i in range(len(formated)):
+    for i in range(len(data)):
         board.resetGrid()
         board.currentPlayer = Board.WHITE
-        for j in range(len(formated[i])-2):
+        for j in range(len(data[i])-2):
             
             # Make VECTOR -> Move combinaison
-            move = board.convertPgn(formated[i][j])
+            move = board.convertPgn(data[i][j])
             X_train.append(board.makeVector())
             Y_train.append(moveToVector(move))
             if not True in Y_train[-1]:
@@ -125,7 +91,10 @@ def constructDataSet(DIR, max=1):
 
     return (X_train, Y_train)
 
-def constructModel(X_train, Y_train, epochs=100):
+def constructModel(X_train, Y_train, duration=60):
+    """
+    Time based training.
+    """
     model = Model()
     criterion = nn.CrossEntropyLoss()
 
@@ -133,7 +102,10 @@ def constructModel(X_train, Y_train, epochs=100):
     optimizer = torch.optim.Adagrad(model.parameters(), lr=0.01)
 
     losses = []
-    for i in range(epochs):
+    start = time.time()
+    epochs = 0
+    current = 0
+    while current-start < duration:
         y_pred = model.forward(X_train) # Get predicted results
 
         # Measure the loss/error, gonna be high at first
@@ -143,32 +115,38 @@ def constructModel(X_train, Y_train, epochs=100):
         losses.append(loss.detach().numpy())        
         
         # print every epoch
-        if i % 1 == 0:
-          print(f'Epoch: {i} and loss: {loss}')     
+        if epochs % 10 == 0:
+            print(f'Epoch: {epochs} and loss: {loss}')     
         # Do some back propagation: take the error rate of forward propagation and feed it back
         
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        current = time.time()
+        epochs += 1
 
-    return model, losses
+    return model, losses, epochs
     
-EPOCHS = 50
-DATASET_SIZE = 200
 
-# BASE
+# VARIABLE
+DURATION = 3600 * 48  # 48h training
+DATASET_SIZE = 20000  # 4% of the dataSet
+
+# DATA EXTRACTION
+# Data folder contain 488930 games
 print("COMPUTING DATA")
 start = time.time()
 X, Y = constructDataSet("data", max=DATASET_SIZE)
+end = time.time()
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
 
+# MODEL CONSTRUCTION
 print("CONSTRUCTING MODEL")
-model, losses = constructModel(X_train, Y_train, epochs=EPOCHS) 
-end = time.time()
-print(f"Formation time: {end-start}")
+model, losses, epochs = constructModel(X_train, Y_train, duration=DURATION) 
+print(f"computed {epochs}, epochs")
 
 
-# TEST OF OUR MODEL:
+# TEST OF THE MODEL:
 correct = 0
 with torch.no_grad():
     for i, data in enumerate(X_test):
@@ -179,38 +157,22 @@ with torch.no_grad():
         if y_val.argmax().item() == normal.index(1.):
             correct +=1
 
-# EPOCHS: 140, DATASET 800; sucess rate: 16% (training time: 1h23)
-# 4 time sized layer, 200/50 success rate: 8.8%
-# 2 time sized layer, 200/50 success rate: 9.9% (training time: 4m)
-# 2 then 4 time sized layer, 200/50 success rate: 7.5%
-# 4 then 2 time sized layer, 200/50 sucess rate 9.9%: 
-# 3 time sized layer, 200/50 sucess rate: 9.0%
-# 4 then 3 time sized layer, 200/50 success rate: 7.5%
-
-# NOW WE KEEP 2 time sized layer, 200/50 and change learning rate:
-# LR = 0.05 => 6.2%
-# LR = 0.01 => 9.9%
-# LR = 0.02 => 3.9%
-
-# OTHER 
-# BASIC 1300/10 => 1%
-# 200/50 relu only at the end => 10.6%
-# 400/90 relu only at the end => 15.0%
-# 600/110 relu only at the end => 16.3% (training time: 17m)
-# 800/140 relu only at the end => % (taining time: )
-
-# OPTIMISER 200/50 & relu only at the end & LR = 0.01:
-# ADAM => %
-# SGD => 0.04%
-# SGD (relu on every step) => 0.19%
-# RMSprop => 1.5%
-# RMSprop (relu on every step) =>  6.8%
-# Adagrad => 5.4%
-# Adagrad (relu on evert step) =>  %
-
 
 print(f'We got {correct} correct on {len(X_test)} ! \t({correct/len(X_test)*100}% success rate.)')
 
+# SAVING THE MODEL
 print("SAVING...")
-torch.save(model.state_dict(), f'{DATASET_SIZE}Games{EPOCHS}EpochsModel.pt')
+torch.save(model.state_dict(), f'{DATASET_SIZE}Games{epochs}EpochsModel.pt')
+
+# SAVING LOG DATA
+with open(f"{os.getlogin()}Log.json", 'w') as f:
+    json.dump({
+        "model": f'{DATASET_SIZE}Games{epochs}EpochsModel.pt',
+        "computingTime": DURATION,
+        "datasetSize": DATASET_SIZE,
+        "epochs": epochs,
+        "successRate": correct/len(X_test),
+        "losses": [i.tolist() for i in losses],
+        "dataComputingTime": end-start
+    }, f, indent=4)
 
