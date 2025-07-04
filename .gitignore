@@ -3,4 +3,4 @@
 /openning
 /.vscode
 /.venv
-/data
+*.pt
