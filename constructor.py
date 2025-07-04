@@ -12,7 +12,7 @@ import json
 
 
 # VARIABLE
-DURATION = 3600 * 48  # 48h training
+DURATION = 3600 * 48   # 48h training
 DATASET_SIZE = 20000  # 4% of the dataSet
             
 def moveToVector(move):
@@ -166,7 +166,7 @@ print("SAVING...")
 torch.save(model.state_dict(), f'{DATASET_SIZE}Games{epochs}EpochsModel.pt')
 
 # SAVING LOG DATA
-with open(f"{os.getlogin()}Log.json", 'w') as f:
+with open(f"log.json", 'w') as f:
     json.dump({
         "model": f'{DATASET_SIZE}Games{epochs}EpochsModel.pt',
         "computingTime": DURATION,
