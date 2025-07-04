@@ -1,5 +1,4 @@
 import os
-import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,7 +10,11 @@ from movement import Movement
 import time
 import json
 
-                
+
+# VARIABLE
+DURATION = 3600 * 48  # 48h training
+DATASET_SIZE = 20000  # 4% of the dataSet
+            
 def moveToVector(move):
     """
     Return a list of all possible move,
@@ -128,9 +131,7 @@ def constructModel(X_train, Y_train, duration=60):
     return model, losses, epochs
     
 
-# VARIABLE
-DURATION = 3600 * 48  # 48h training
-DATASET_SIZE = 20000  # 4% of the dataSet
+
 
 # DATA EXTRACTION
 # Data folder contain 488930 games
