@@ -450,7 +450,7 @@ class Board:
                             for y in range(8):
                                 move = Movement(piece=piece, origin=f"{chr(ord('h') - j)}{i + 1}", dest=f"{chr(ord('h') - y)}{x + 1}")
                                 if self.isLegalMove(move):
-                                    board.play(move)
+                                    self.play(move)
                                     if not self.isCheck():
                                         issueFound = True
                                     self.setGrid(copy.deepcopy(grid))
