@@ -44,7 +44,7 @@ class Board:
         Reset grid to default position.
         """
         self.grid = [
-            # a     b    c       d     e     f     g     h   y/x
+            # h     g     f      e    d     c     b     a   y/x
             ['WR', 'WN', 'WB', 'WK', 'WQ', 'WB', 'WN', 'WR'], # 1
             ['WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP', 'WP'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
@@ -60,7 +60,7 @@ class Board:
         Reset grid to empty board.
         """
         self.grid = [
-            # a     b    c       d     e     f     g     h   y/x
+            # h     g     f      e    d     c     b     a   y/x
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 1
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 2
             ['00', '00', '00', '00', '00', '00', '00', '00'], # 3
