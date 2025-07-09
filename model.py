@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-VECTOR_SIZE = 768 + 1   # Current player color
+VECTOR_SIZE = 768 + 2   # Current player color & turn number
 POSSIBLE_MOVE = 4096 + 2   # a1 -> a2 (64x64 possibilities)
 
 class Model(nn.Module):

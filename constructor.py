@@ -12,8 +12,8 @@ import json
 
 
 # VARIABLE
-DURATION = 3600 * 48   # 48h training
-DATASET_SIZE = 20000  # 4% of the dataSet
+DURATION = 3600*24*7   # full week training
+DATASET_SIZE = 244000  # 50% of the dataSet
             
 def moveToVector(move):
     """
@@ -176,4 +176,3 @@ with open(f"log.json", 'w') as f:
         "losses": [i.tolist() for i in losses],
         "dataComputingTime": end-start
     }, f, indent=4)
-

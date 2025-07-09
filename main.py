@@ -3,13 +3,20 @@ from constructor import constructDataSet, VectorToMove
 from model import Model
 import torch
 
-
+# NNUE
+# (Transformers ?)
+# chessformer 
+# Alpha0
+# MU0
+# ARC ? ARK ?
+# Embarquer le numéro de coup dans le vecteur
+# try CNN
 
 # Game init
 board = Board()
 
 model = Model()
-model.load_state_dict(torch.load('800Games140EpochsModel.pt'))
+model.load_state_dict(torch.load('20000Games1369EpochsModel.pt'))
 
 def next():
     val = model.forward(torch.FloatTensor(board.makeVector()))

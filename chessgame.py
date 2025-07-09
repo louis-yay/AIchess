@@ -35,6 +35,7 @@ class Board:
         ]
 
         self.currentPlayer = self.WHITE
+        self.turn = 0
 
     def getGrid(self):
         return self.grid
@@ -92,7 +93,7 @@ class Board:
         WP, WR, WN, WB, WQ, WK, BP, BR, BN, BB, BQ, BK
         """
         # Case vide déterminable après coup
-        vector = [self.currentPlayer]
+        vector = [self.currentPlayer, self.turn]
         pieces = ['WP', 'WR', 'WN', 'WB', 'WQ', 'WK', 'BP', 'BR', 'BN', 'BB', 'BQ', 'BK']
         for n in range(len(pieces)):
             for i in range(8):
@@ -115,6 +116,7 @@ class Board:
 
     def nextTurn(self):
         self.currentPlayer = not self.currentPlayer
+        self.turn += 1
         
     def isBlack(self, piece):
         """
