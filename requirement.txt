@@ -1,0 +1,6 @@
+chess
+kaggle
+numpy
+pandas
+torch
+scikit-learn
