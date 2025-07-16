@@ -1,5 +1,5 @@
-import chess
-import numpy as np
+import time
+from datetime import timedelta
 import pandas as pd
 import gc
 import torch
@@ -24,7 +24,7 @@ data = data[data['AN'].str.len() > 20]
 print(f"loaded {data.shape[0]}")
 # 883k games
 
-trainingData = ChessDataset(data, 880_000)
+trainingData = ChessDataset(data, 20_000)
 
 
 train_data, val_data = train_test_split(trainingData, test_size=0.1, random_state=42)
@@ -47,13 +47,15 @@ dataTrainLoader = DataLoader(train_data, batch_size=32, drop_last=True)
 print(f"final training data: {dataTrainLoader}")
 
 # Training parameters
-num_epochs = 100
+num_epochs = 1
 
-# 5 epoch -> 32.8%
+start = time.time()
+current = start
+TRAINING_TIME = 3600
 
-for epoch in range(num_epochs):
+while (time.time() - start) < TRAINING_TIME:
     total_loss = 0
-    progress = tqdm(dataTrainLoader, desc=f"Epoch {epoch+1}/{num_epochs}")
+    progress = tqdm(dataTrainLoader, desc=f"Remaining time: {timedelta(seconds=round(TRAINING_TIME - (time.time() - start)))}, epoch: {num_epochs}")
 
     for x, y in progress:
         x = x.float().to(device)        # Shape: (B, 6, 8, 8)
@@ -79,7 +81,8 @@ for epoch in range(num_epochs):
         total_loss += loss.item()
         progress.set_postfix(loss=total_loss / (progress.n + 1))
 
-    print(f"Epoch {epoch+1} Average Loss: {total_loss / len(dataTrainLoader):.4f}")
+    print(f"Epoch {num_epochs} Average Loss: {total_loss / len(dataTrainLoader):.4f}")
+    num_epochs += 1
 
 # Save model after training
 print("saving...")
