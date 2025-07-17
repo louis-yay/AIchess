@@ -9,7 +9,7 @@ class module(nn.Module):
         self.conv1 = nn.Conv2d(hidden_size, hidden_size, 3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(hidden_size, hidden_size, 3, stride=1, padding=1)
         
-        # Batch layer
+        # Batch layer (fully connected)
         self.bn1 = nn.BatchNorm2d(hidden_size)
         self.bn2 = nn.BatchNorm2d(hidden_size)
         self.activ1 = nn.SELU()
