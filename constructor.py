@@ -1,10 +1,8 @@
 import os
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from model import Model, VECTOR_SIZE, POSSIBLE_MOVE
+from model import Model
 from chessgame import Board
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from movement import Movement
 import time

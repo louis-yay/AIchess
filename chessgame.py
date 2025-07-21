@@ -1,7 +1,6 @@
-from math import sqrt, floor
+from math import floor
 from position import Position
 from movement import Movement
-from random import choice
 import copy
 
 

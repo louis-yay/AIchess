@@ -3,15 +3,6 @@ from constructor import constructDataSet, VectorToMove
 from model import Model
 import torch
 
-# NNUE
-# (Transformers ?)
-# chessformer 
-# Alpha0
-# MU0
-# ARC ? ARK ?
-# Embarquer le numéro de coup dans le vecteur
-# try CNN
-
 # Game init
 board = Board()
 
