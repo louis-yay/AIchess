@@ -1,13 +1,15 @@
+from chess import Board, Move
 import chess
 import torch
 import numpy as np
-from dataset import boardToRep, moveToRep, createLayer, letterToNum, numToLetter
+from dataset import boardToRep, letterToNum
 from chessnet import chessNet
-import re
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = chessNet() # .to(device)
-model.load_state_dict(torch.load('chessNet.pth', weights_only=True))
+print(device)
+model = chessNet().to(device)
+model.load_state_dict(torch.load('chessNet.pth', weights_only=True, map_location=torch.device('cpu')))
 
 @torch.no_grad()  # Disable gradient calculation for efficiency
 def predict(x):
@@ -89,6 +91,41 @@ def chooseMove(board, color):
     choosenMove = legalMoves[np.argmax(vals)]
     return choosenMove
 
-board = chess.Board()
+
+board = Board()
+
+while not board.is_game_over():
+
+    # COMPUTER TURN
+    move = chooseMove(board, chess.WHITE)
+    if move == None:
+        print("Computer Resign.")
+        exit()
+    board.push(move)
+    print(f"Computer play {move}")
+    print(board)
+
+    # PLAYER TURN
+    while not board.is_legal(move):
+        strmove = input("Choose move in format [origin][dest]\n>>> ")
+        move = Move(chess.SQUARES[chess.parse_square(strmove[:2])], chess.SQUARES[chess.parse_square(strmove[2:])])
+
+    print(f"You played {move}")
+    board.push(move)
+    print(board)
+
+
+
+print(f"{board.result()}")
+
+
+
+board = Board()
 move = chooseMove(board, chess.WHITE)
-print(move)
+print(board.is_legal(Move(chess.E2, chess.E5)))
+print(board.san(Move(chess.E2, chess.E4)))
+board.push(Move(chess.E2, chess.E4))
+print(board.variation_san(board.move_stack))
+
+
+print(chess.SQUARES[chess.parse_square('e4')] == chess.E4)
