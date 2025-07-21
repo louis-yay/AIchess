@@ -1,12 +1,6 @@
 from chessgame import Board
-import random
 from constructor import constructNGRam
-import time
 from Node import Node
-from saving import save, load
-import time
-
-
 
 # Game init
 board = Board()
@@ -47,9 +41,6 @@ def next(log, depth):
 
     gamelog.append(out[1])
     return out[0]
-            
-
-
 
 while running:
     # TODO Check winning conditions

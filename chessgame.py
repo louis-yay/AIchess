@@ -4,8 +4,6 @@ from movement import Movement
 from random import choice
 import copy
 
-
-
 class Board:
     """
     This class define the chess board and the game.

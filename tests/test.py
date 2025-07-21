@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 from Node import Node
 from constructor import constructNGRam
 
-
-
 # The test here is to build 2 type of NGram,
 # One base on the classic database and another on a specific
 # The specific database class the games by oppening

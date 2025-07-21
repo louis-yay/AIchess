@@ -1,6 +1,4 @@
 import os
-from saving import load, save
-from chessgame import Board
 from Node import Node
 
 # Maximal asbtraction version
