@@ -1,6 +1,5 @@
 import os
 from Node import Node
-from saving import load, save
 
 def constructTree(DIR, max=1000):
     """

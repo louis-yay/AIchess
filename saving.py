@@ -1,5 +1,4 @@
 import pickle
-from Node import Node
 
 def save(tree, path):
     print("Saving data...")

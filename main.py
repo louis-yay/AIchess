@@ -1,5 +1,3 @@
-from saving import save, load
-from Node import Node
 from constructor import constructTree
 from chessgame import Board
 from random import choice
